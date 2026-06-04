@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Command gh -ErrorAction SilentlyContinue; Get-Command \"github\" -ErrorAction SilentlyContinue; Test-Path \"C:\\\\Users\\\\com\\\\AppData\\\\Local\\\\GitHubDesktop\" ; Test-Path \"$env:LOCALAPPDATA\\\\GitHubDesktop\")",
+      "PowerShell(\\(Get-Command git -ErrorAction SilentlyContinue\\).Source)",
+      "PowerShell(\\(Get-Command winget -ErrorAction SilentlyContinue\\).Source)",
+      "PowerShell(winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements)",
+      "PowerShell($env:PATH += \";C:\\\\Program Files\\\\Git\\\\bin\"; git --version)",
+      "PowerShell($env:PATH += \";C:\\\\Program Files\\\\Git\\\\bin\"; cd \"C:\\\\Users\\\\com\\\\Documents\\\\guro\"; git init; git remote add origin https://github.com/hyunsoheun/guro.git 2>&1; git remote -v)",
+      "PowerShell($env:PATH += \";C:\\\\Program Files\\\\Git\\\\bin\"; cd \"C:\\\\Users\\\\com\\\\Documents\\\\guro\"; git config user.email \"doremi9240.1@gmail.com\"; git config user.name \"hyunsoheun\"; git add -A; git status)"
+    ]
+  }
+}

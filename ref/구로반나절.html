@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>신나는 모험 in 구로 — 서울 속 이색 반나절 코스</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #EDECE6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { display: none; }
+    * { scrollbar-width: none; }
+
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes stampPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.35); }
+      60% { box-shadow: 0 0 0 7px rgba(217,119,6,0); }
+    }
+
+    .place-btn { transition: transform 0.14s ease, box-shadow 0.14s ease; }
+    .place-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important; }
+    .place-btn:active { transform: scale(0.985) !important; }
+
+    .stamp-preview-btn { transition: transform 0.14s ease, opacity 0.14s; }
+    .stamp-preview-btn:hover { opacity: 0.85; transform: scale(1.03); }
+    .stamp-preview-btn:active { transform: scale(0.97); }
+
+    .cta-btn { transition: opacity 0.14s, transform 0.14s; }
+    .cta-btn:hover { opacity: 0.9; }
+    .cta-btn:active { transform: scale(0.98); }
+
+    .kakao-btn { transition: opacity 0.14s, transform 0.14s; }
+    .kakao-btn:hover { opacity: 0.88; }
+    .kakao-btn:active { transform: scale(0.98); }
+
+    .close-btn:hover { background: #e4e4e7 !important; }
+
+    .tag-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; border-radius: 20px; padding: 3px 10px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+  const { useState, useEffect, useCallback } = React;
+
+  /* ─── 장소 데이터 ─── */
+  const PLACES = [
+    {
+      id: 'lunch', order: 1,
+      name: '깔깔 거리 식당',
+      category: '점심 식사', duration: '1시간', budget: 15000, budgetLabel: '₩15,000',
+      description: '코스 시작 전 든든한 한 끼. 현지 직장인 맛집.',
+      detail: '구로디지털단지역 인근 현지인들이 즐겨 찾는 식당가. 합리적인 가격에 푸짐한 한 끼를 해결할 수 있어요. 코스 출발 전 에너지 충전 필수!',
+      address: '서울 구로구 디지털로 일대',
+      transport: '구로디지털단지역 1번 출구 도보 5분',
+      tip: '점심 피크타임(12~13시)을 피하면 대기 없이 바로 입장 가능해요.',
+      emoji: '🍜', bg: '#FFF3E0', accent: '#E65100', isRequired: false,
+      photo: 'uploads/캡처11.PNG',
+    },
+    {
+      id: 'netmarble', order: 2,
+      name: '넷마블 게임 박물관',
+      category: '게임 체험', duration: '1시간 30분', budget: 10000, budgetLabel: '입장료 성인 ₩10,000',
+      description: '레트로 오락실부터 최신 게임까지. 코스 최고 하이라이트!',
+      detail: '넷마블 본사 1층에 위치한 게임 테마 뮤지엄. 80~90년대 오락실 게임기를 직접 체험하고 레트로 게임의 추억을 되살릴 수 있어요. 게임을 잘 몰라도 충분히 재미있는 공간.',
+      address: '서울 구로구 디지털로 242',
+      transport: '구로 디지털 단지역에서 도보로 15분',
+      tip: '2층 레트로 오락실 코너가 최고의 인증샷 포인트! 줄 설 수 있으니 오전 방문 추천.',
+      hours: '10:00 ~ 18:00 (월요일 휴관)',
+      emoji: '🎮', bg: '#EDE7F6', accent: '#4527A0', isRequired: true,
+      photo: 'uploads/게임박물관2.jpg',
+      photos: ['uploads/게임박물관2.jpg', 'uploads/게임박물관.jpg', 'uploads/게임박물관3.jpg', 'uploads/안내.jpg', 'uploads/20260527_100943.jpg'],
+    },
+    {
+      id: 'coffee', order: 3,
+      name: '커피 브레이크',
+      category: '카페 휴식', duration: '30분', budget: 7000, budgetLabel: '₩7,000',
+      description: '박물관 관람 후 잠깐 쉬어가는 달콤한 휴식.',
+      detail: '넷마블 게임 박물관 관람 후 인근 카페에서 잠깐 쉬어가요. 구로디지털단지 일대에는 개성 있는 카페들이 많아요. 다음 이동을 위한 에너지 충전!',
+      address: '구로디지털단지 카페거리',
+      transport: '이전 장소에서 도보 5분',
+      tip: '간단한 디저트와 함께하면 더욱 좋아요.',
+      emoji: '☕', bg: '#FFF8E1', accent: '#D84315', isRequired: false,
+      photo: 'uploads/커피브레이크.jpg',
+    },
+    {
+      id: 'gvalley', order: 4,
+      name: 'G밸리 산업 박물관',
+      category: '역사 체험', duration: '30분', budget: 0, budgetLabel: '무료',
+      description: '구로공단의 역사를 VR로. 무료인데 너무 알차요!',
+      detail: '1960~70년대 구로공단의 역사를 담은 박물관. 당시 공장 노동자들의 삶과 한국 산업화 역사를 VR 체험을 포함해 생생하게 느낄 수 있어요. 무료라는 게 믿기지 않을 정도로 알찬 구성.',
+      address: '서울 구로구 디지털로 26길',
+      transport: '이전 장소에서 도보 8분',
+      tip: 'VR 체험 대기가 생길 수 있으니 미리 대기 등록 추천.',
+      hours: '09:00 ~ 18:00 (월요일 휴관)',
+      emoji: '🏭', bg: '#E3F2FD', accent: '#1565C0', isRequired: false,
+      photo: 'uploads/산업박물관 vr.jpg',
+      photos: ['uploads/산업박물관 vr.jpg', 'uploads/산업박물관2 vr.jpg', 'uploads/산업박물관3 vr.jpg', 'uploads/산업박물곤4.jpg'],
+    },
+    {
+      id: 'market', order: 5,
+      name: '남구로 시장',
+      category: '시장 탐방', duration: '1시간', budget: 10000, budgetLabel: '₩10,000',
+      description: '서울 속 작은 중국. 이국적인 골목 탐방!',
+      detail: '색안경만 걷고 보면 서울 한복판의 작은 중국. 중국 식재료와 간판, 거리 분위기가 마치 중국 소도시에 온 듯한 이색 경험을 선사해요. 다양한 중국 간식을 저렴하게 맛볼 수 있고 골목 구석구석 탐방하는 재미가 있어요.',
+      address: '서울 구로구 남구로 일대',
+      transport: '이전 장소에서 버스로 15분',
+      tip: '오후 3~5시가 시장이 가장 활기찰 때. 현금 지참 추천.',
+      emoji: '🏮', bg: '#FFEBEE', accent: '#C62828', isRequired: true,
+      photo: 'uploads/남구로시장6.jpg',
+      photos: ['uploads/남구로시장6.jpg', 'uploads/남구로시장1.jpg', 'uploads/남구로시장 2.jpg', 'uploads/남구로시장3.jpg', 'uploads/남구로시장4.jpg', 'uploads/남구로시장5.jpg', 'uploads/남구로시장.jpg'],
+    },
+    {
+      id: 'restaurant', order: 6,
+      name: '린궁즈멘관',
+      category: '중국 정통 음식', duration: '40분', budget: 10000, budgetLabel: '₩10,000',
+      description: '중국 본토 맛 그대로. 현지인도 인정한 정통 중식.',
+      detail: '남구로 시장 인근에 위치한 정통 중국 음식점. 중국 현지 요리사가 만드는 본토 맛으로 유명해요. 양이 푸짐하고 가격도 착한 편. 중국 음식을 제대로 맛보고 싶다면 꼭 방문.',
+      address: '서울 구로구 남구로 인근',
+      transport: '남구로 시장에서 도보 3분',
+      tip: '마라탕과 훠궈가 시그니처 메뉴. 매운 음식에 약한 분은 주의!',
+      hours: '11:00 ~ 21:00',
+      emoji: '🥟', bg: '#FCE4EC', accent: '#AD1457', isRequired: true,
+      photo: 'uploads/린궁즈멘관.jpg',
+      photos: ['uploads/린궁즈멘관.jpg', 'uploads/린궁즈멘관 메뉴판.jpg'],
+    },
+    {
+      id: 'bakery', order: 7,
+      name: '중국 베이커리',
+      category: '스탬프 수령 장소', duration: '20분', budget: 5000, budgetLabel: '₩5,000~',
+      description: '마지막 스탬프 장소! 호떡으로 달콤하게 마무리.',
+      detail: '구로 반나절 코스의 피날레. 핵심 3곳 스탬프를 완료한 후 이곳에서 완주 사은품(중국 호떡 1개)을 받을 수 있어요. 중국식 호떡과 각종 호빵이 인기 메뉴.',
+      address: '서울 구로구 남구로 인근',
+      transport: '이전 장소에서 도보 2분',
+      tip: '스탬프 완주 화면을 캡처해서 점원에게 보여주면 호떡 1개 무료!',
+      emoji: '🧁', bg: '#FFF9C4', accent: '#E65100', isRequired: false, isFinal: true,
+      photo: 'uploads/중국빵.jpg',
+    },
+  ];
+
+  /* ─── 사진 플레이스홀더 ─── */
+  const PhotoThumb = ({ place, size = 72, radius = 10 }) => (
+    <div style={{
+      width: size, height: size, borderRadius: radius,
+      background: place.bg, flexShrink: 0, overflow: 'hidden', position: 'relative',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {place.photo ? (
+        <img src={place.photo} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', padding: '4px' }} />
+      ) : (
+        <>
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden="true">
+            <defs>
+              <pattern id={'th_' + place.id} width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="9" stroke={place.accent} strokeWidth="1" opacity="0.12" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={'url(#th_' + place.id + ')'} />
+          </svg>
+          <span style={{ fontSize: size * 0.38, position: 'relative', zIndex: 1, lineHeight: 1 }}>{place.emoji}</span>
+        </>
+      )}
+    </div>
+  );
+
+  const PhotoHero = ({ place }) => {
+    const [active, setActive] = useState(0);
+    const gallery = place.photos || (place.photo ? [place.photo] : null);
+    if (!gallery) return (
+      <div style={{ height: 220, background: place.bg, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden="true">
+          <defs>
+            <pattern id={'mh_' + place.id} width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="14" stroke={place.accent} strokeWidth="1.5" opacity="0.1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill={'url(#mh_' + place.id + ')'} />
+        </svg>
+        <span style={{ fontSize: 88, position: 'relative', zIndex: 1, lineHeight: 1 }}>{place.emoji}</span>
+        <div style={{ position: 'absolute', bottom: 12, right: 14, zIndex: 2, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(6px)', borderRadius: 8, padding: '3px 9px', fontSize: 11, color: '#71717a' }}>실사진 준비 중</div>
+      </div>
+    );
+    return (
+      <div style={{ position: 'relative', background: place.bg }}>
+        <div style={{ height: 240, overflow: 'hidden', position: 'relative' }}>
+          <img src={gallery[active]} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', transition: 'opacity 0.2s' }} />
+        </div>
+        {gallery.length > 1 && (
+          <div style={{ display: 'flex', gap: 8, padding: '10px 14px', overflowX: 'auto', background: '#fff' }}>
+            {gallery.map((src, i) => (
+              <button key={i} onClick={() => setActive(i)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 10, overflow: 'hidden', border: active === i ? '2.5px solid #D97706' : '2px solid #e4e4de', padding: 0, cursor: 'pointer', background: 'none', transition: 'border 0.15s' }}>
+                <img src={src} alt={place.name + ' ' + (i + 1)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ─── 장소 카드 ─── */
+  const PlaceCard = ({ place, idx, onSelect }) => {
+    const isLast = place.order === PLACES.length;
+    return (
+      <div style={{ display: 'flex', animation: `cardIn 0.38s ease ${idx * 0.06}s both` }}>
+        {/* 타임라인 */}
+        <div style={{ width: 46, display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+            background: place.isRequired ? '#D97706' : '#ddddd7',
+            color: place.isRequired ? '#fff' : '#888880',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 13, fontWeight: 700, zIndex: 1,
+            animation: place.isRequired ? 'stampPulse 2.4s 1s infinite' : 'none',
+          }}>{place.order}</div>
+          {!isLast && (
+            <div style={{
+              width: 2, flex: 1, minHeight: 20, marginTop: 5, marginBottom: 5,
+              background: 'repeating-linear-gradient(to bottom, #c8c8c2 0 4px, transparent 4px 9px)',
+            }} />
+          )}
+        </div>
+
+        {/* 카드 */}
+        <button
+          className="place-btn"
+          onClick={() => onSelect(place)}
+          style={{
+            flex: 1, textAlign: 'left', background: '#fff', border: 'none',
+            cursor: 'pointer', borderRadius: 18, padding: '14px 14px 14px 4px',
+            display: 'flex', gap: 12, alignItems: 'flex-start',
+            marginBottom: isLast ? 0 : 12,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            position: 'relative', overflow: 'hidden', fontFamily: 'inherit',
+          }}
+        >
+          {place.isRequired && (
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#D97706', borderRadius: '0 2px 2px 0' }} />
+          )}
+          <div style={{ paddingLeft: place.isRequired ? 8 : 0, flex: 1, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <PhotoThumb place={place} size={72} radius={11} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 11, color: '#888880', fontWeight: 500 }}>{place.category}</span>
+                {place.isRequired && (
+                  <span style={{ fontSize: 10, background: '#D97706', color: '#fff', borderRadius: 5, padding: '1px 7px', fontWeight: 700, flexShrink: 0 }}>★ 스탬프</span>
+                )}
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#111', marginBottom: 5, lineHeight: 1.3 }}>{place.name}</div>
+              <div style={{ fontSize: 13, color: '#52525b', lineHeight: 1.55, marginBottom: 9 }}>{place.description}</div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span style={{ fontSize: 11, color: '#888880' }}>⏱ {place.duration}</span>
+                <span style={{ color: '#d4d4ce' }}>·</span>
+                <span style={{ fontSize: 11, color: place.budget === 0 ? '#059669' : '#888880', fontWeight: place.budget === 0 ? 700 : 400 }}>
+                  {place.budget === 0 ? '● 무료' : place.budgetLabel}
+                </span>
+              </div>
+            </div>
+            <span style={{ color: '#c8c8c2', fontSize: 20, alignSelf: 'center', flexShrink: 0, paddingRight: 2, lineHeight: 1 }}>›</span>
+          </div>
+        </button>
+      </div>
+    );
+  };
+
+  /* ─── 상세 모달 ─── */
+  const DetailModal = ({ place, onClose }) => {
+    useEffect(() => {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const onKey = e => { if (e.key === 'Escape') onClose(); };
+      window.addEventListener('keydown', onKey);
+      return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); };
+    }, [onClose]);
+
+    const stats = [
+      { icon: '⏱', val: place.duration, label: '소요 시간', green: false },
+      { icon: place.budget === 0 ? '🎁' : '💰', val: place.budgetLabel, label: '예상 비용', green: place.budget === 0 },
+      ...(place.hours ? [{ icon: '🕐', val: place.hours, label: '운영 시간', green: false }] : []),
+    ];
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', animation: 'fadeIn 0.2s' }} />
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            position: 'relative', zIndex: 1, background: '#fff',
+            borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 480,
+            maxHeight: '91vh', overflowY: 'auto', overflowX: 'hidden',
+            animation: 'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
+          }}
+        >
+          {/* 핸들 */}
+          <div style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10, padding: '12px 0 6px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: '#e4e4de' }} />
+          </div>
+
+          <PhotoHero place={place} />
+
+          <div style={{ padding: '20px 20px 52px' }}>
+            {/* 타이틀 */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+              <div style={{ flex: 1, marginRight: 12 }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, background: place.bg, color: place.accent, borderRadius: 6, padding: '3px 10px', fontWeight: 600 }}>{place.category}</span>
+                  {place.isRequired && (
+                    <span style={{ fontSize: 11, background: '#D97706', color: '#fff', borderRadius: 6, padding: '3px 10px', fontWeight: 700 }}>★ 스탬프 필수</span>
+                  )}
+                </div>
+                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111', lineHeight: 1.2 }}>{place.name}</h2>
+              </div>
+              <button
+                className="close-btn"
+                onClick={onClose}
+                style={{ width: 36, height: 36, borderRadius: '50%', background: '#f4f4f0', border: 'none', cursor: 'pointer', fontSize: 14, color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'inherit', transition: 'background 0.14s' }}
+              >✕</button>
+            </div>
+
+            {/* 통계 */}
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+              {stats.map((s, i) => (
+                <div key={i} style={{ flex: 1, background: s.green ? '#f0fdf4' : '#f7f7f3', borderRadius: 14, padding: '13px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, marginBottom: 5 }}>{s.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: s.green ? '#059669' : '#111', lineHeight: 1.3, marginBottom: 3 }}>{s.val}</div>
+                  <div style={{ fontSize: 10, color: '#888880' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* 설명 */}
+            <p style={{ fontSize: 15, color: '#3f3f46', lineHeight: 1.78, marginBottom: 22 }}>{place.detail}</p>
+
+            {/* 정보 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>📍</span>
+                <div>
+                  <div style={{ fontSize: 11, color: '#888880', marginBottom: 2 }}>주소</div>
+                  <div style={{ fontSize: 14, color: '#111', lineHeight: 1.5 }}>{place.address}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>🚶</span>
+                <div>
+                  <div style={{ fontSize: 11, color: '#888880', marginBottom: 2 }}>이동 방법</div>
+                  <div style={{ fontSize: 14, color: '#111', lineHeight: 1.5 }}>{place.transport}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 팁 */}
+            {place.tip && (
+              <div style={{ marginTop: 16, background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
+                <p style={{ fontSize: 13, color: '#92400e', lineHeight: 1.65 }}>{place.tip}</p>
+              </div>
+            )}
+
+            {/* 완주 배너 */}
+            {place.isFinal && (
+              <div style={{ marginTop: 20, background: '#D97706', borderRadius: 18, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center' }}>
+                <span style={{ fontSize: 34, flexShrink: 0 }}>🎉</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 5 }}>스탬프 완주 사은품 수령 장소</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6 }}>핵심 3곳 스탬프 완료 후 완주 화면을 보여주시면 호떡 1개를 드려요!</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ─── 스탬프 도전 모달 ─── */
+  const StampModal = ({ onClose }) => {
+    useEffect(() => {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const onKey = e => { if (e.key === 'Escape') onClose(); };
+      window.addEventListener('keydown', onKey);
+      return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); };
+    }, [onClose]);
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', animation: 'fadeIn 0.2s' }} />
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            position: 'relative', zIndex: 1, background: '#fff',
+            borderRadius: '24px 24px 0 0', padding: '0 22px 44px',
+            width: '100%', maxWidth: 480,
+            animation: 'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 0 20px' }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: '#e4e4de' }} />
+          </div>
+
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ fontSize: 60, marginBottom: 14, lineHeight: 1 }}>🎯</div>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: '#111', marginBottom: 8 }}>스탬프 도전하기</h3>
+            <p style={{ fontSize: 14, color: '#71717a', lineHeight: 1.7 }}>카카오 로그인 후 핵심 3곳을 방문하고<br />사진으로 인증하면 호떡 1개가 무료!</p>
+          </div>
+
+          {/* 스탬프 3곳 미리보기 */}
+          <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+            {PLACES.filter(p => p.isRequired).map((p, i) => (
+              <div key={p.id} style={{ flex: 1, textAlign: 'center' }}>
+                <div style={{ aspectRatio: '1', borderRadius: 14, background: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, marginBottom: 6, border: '2px dashed rgba(217,119,6,0.3)', position: 'relative' }}>
+                  <span style={{ lineHeight: 1 }}>{p.emoji}</span>
+                  <div style={{ position: 'absolute', top: -5, right: -5, width: 18, height: 18, borderRadius: '50%', background: '#D97706', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>★</div>
+                </div>
+                <div style={{ fontSize: 10, color: '#52525b', lineHeight: 1.4 }}>{i + 1}번</div>
+                <div style={{ fontSize: 11, color: '#111', fontWeight: 600, lineHeight: 1.3 }}>
+                  {p.name.length > 6 ? p.name.slice(0, 6) + '…' : p.name}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: 12, padding: '12px 16px', marginBottom: 20, display: 'flex', gap: 9, alignItems: 'flex-start' }}>
+            <span style={{ flexShrink: 0, fontSize: 14 }}>💡</span>
+            <span style={{ fontSize: 12, color: '#92400e', lineHeight: 1.6 }}>팝업이 차단됐다면 브라우저 팝업 허용 설정이 필요해요.</span>
+          </div>
+
+          <button
+            className="kakao-btn"
+            onClick={onClose}
+            style={{ width: '100%', padding: '17px 24px', background: '#FEE500', color: '#111', border: 'none', borderRadius: 16, cursor: 'pointer', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: 'inherit' }}
+          >
+            카카오 로그인으로 시작하기
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  /* ─── 메인 앱 ─── */
+  const App = () => {
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [showStamp, setShowStamp] = useState(false);
+    const requiredPlaces = PLACES.filter(p => p.isRequired);
+
+    return (
+      <div style={{ fontFamily: "'Noto Sans KR', sans-serif", background: '#EDECE6', minHeight: '100vh' }}>
+
+        {/* ══ 히어로 ══ */}
+        <div style={{ background: '#111', position: 'relative', overflow: 'hidden', padding: '60px 22px 46px' }}>
+          <div style={{ position: 'absolute', top: -80, right: -50, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(200,55,44,0.2) 0%, transparent 68%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -60, left: -30, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(217,119,6,0.16) 0%, transparent 68%)', pointerEvents: 'none' }} />
+
+          <div style={{ maxWidth: 480, margin: '0 auto', position: 'relative' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(200,55,44,0.18)', borderRadius: 20, padding: '4px 14px', marginBottom: 14 }}>
+              <span style={{ fontSize: 12 }}>🗺</span>
+              <span style={{ fontSize: 12, color: '#f87171', fontWeight: 600 }}>서울 구로구 어드벤처 가이드</span>
+            </div>
+
+            <h1 style={{ fontSize: 46, fontWeight: 900, color: '#fff', lineHeight: 1.05, marginBottom: 10, letterSpacing: '-0.025em' }}>
+              신나는 모험<br /><span style={{ color: '#f87171' }}>in 구로</span>
+            </h1>
+
+            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.52)', lineHeight: 1.7, marginBottom: 30 }}>
+              게임, 박물관, 시장, 중국 본토 음식까지<br />구로에서 펼쳐지는 반나절 빅재미!
+            </p>
+
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { icon: '💰', label: '총 예산', val: '5만원' },
+                { icon: '⏱', label: '소요', val: '약 4시간' },
+                { icon: '📍', label: '장소', val: '7곳' },
+              ].map(s => (
+                <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '10px 16px', backdropFilter: 'blur(8px)' }}>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>{s.icon} {s.label}</div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{s.val}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ══ 바디 ══ */}
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 15px 140px' }}>
+
+          {/* 스탬프 챌린지 프리뷰 */}
+          <div style={{ background: '#fff', borderRadius: 22, padding: '18px 20px', marginTop: 20, marginBottom: 26, border: '1px solid rgba(217,119,6,0.18)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+              <span style={{ fontSize: 20 }}>🎯</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>스탬프 챌린지</span>
+              <span style={{ fontSize: 12, color: '#888880' }}>3곳 완주 → 호떡 무료</span>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {requiredPlaces.map((p, i) => (
+                <button
+                  key={p.id}
+                  className="stamp-preview-btn"
+                  onClick={() => setSelectedPlace(p)}
+                  style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}
+                >
+                  <div style={{ aspectRatio: '1', borderRadius: 14, background: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 6, border: '2px dashed rgba(217,119,6,0.28)', position: 'relative' }}>
+                    <span style={{ lineHeight: 1 }}>{p.emoji}</span>
+                    <div style={{ position: 'absolute', top: -5, right: -5, width: 18, height: 18, borderRadius: '50%', background: '#D97706', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>★</div>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#52525b', lineHeight: 1.4, textAlign: 'center' }}>
+                    {p.name.length > 6 ? p.name.slice(0, 6) + '…' : p.name}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 코스 섹션 */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111' }}>반나절 코스</h2>
+              <span style={{ fontSize: 13, color: '#888880' }}>눌러서 자세히 보기</span>
+            </div>
+            <div>
+              {PLACES.map((place, idx) => (
+                <PlaceCard key={place.id} place={place} idx={idx} onSelect={setSelectedPlace} />
+              ))}
+            </div>
+          </div>
+
+          {/* 지도 섹션 */}
+          <div style={{ marginTop: 38 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', marginBottom: 14 }}>코스 지도</h2>
+            <div style={{ borderRadius: 22, overflow: 'hidden', background: '#e0dfd9', position: 'relative' }}>
+              {/* 지도 이미지 */}
+              <img src="uploads/캡처10.PNG" alt="구로 반나절 코스 지도" style={{ width: '100%', display: 'block' }} />
+              {/* 깔끔한 오버레이 레이블 */}
+              <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+
+                {/* ① 깔깔거리 */}
+                <div style={{ position: 'absolute', top: '33%', right: '5%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                  <div style={{ background: '#D97706', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)', fontFamily: "'Noto Sans KR', sans-serif" }}>① 깔깔거리</div>
+                </div>
+
+                {/* ② 넷마블 */}
+                <div style={{ position: 'absolute', top: '68%', left: '37%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                  <div style={{ background: '#4527A0', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)', fontFamily: "'Noto Sans KR', sans-serif" }}>② 넷마블게임박물관</div>
+                </div>
+
+                {/* ③ G밸리 */}
+                <div style={{ position: 'absolute', top: '60%', left: '55%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                  <div style={{ background: '#1565C0', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)', fontFamily: "'Noto Sans KR', sans-serif" }}>③ G밸리산업박물관</div>
+                </div>
+
+                {/* ④ 남구로시장 */}
+                <div style={{ position: 'absolute', top: '7%', left: '12%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                  <div style={{ background: '#C62828', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)', fontFamily: "'Noto Sans KR', sans-serif" }}>④ 남구로 시장</div>
+                </div>
+
+                {/* ⑤ 린궁즈멘관 */}
+                <div style={{ position: 'absolute', top: '20%', left: '14%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                  <div style={{ background: '#AD1457', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)', fontFamily: "'Noto Sans KR', sans-serif" }}>⑤ 린궁즈멘관</div>
+                </div>
+
+                {/* 이동 배지: 도보 5분 */}
+                <div style={{ position: 'absolute', top: '48%', left: '53%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.92)', border: '1.5px solid #e4e4de', borderRadius: 10, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#111', whiteSpace: 'nowrap', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', fontFamily: "'Noto Sans KR', sans-serif" }}>🚶 도보 5분</div>
+                </div>
+
+                {/* 이동 배지: 버스 15분 */}
+                <div style={{ position: 'absolute', top: '42%', left: '20%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.92)', border: '1.5px solid #e4e4de', borderRadius: 10, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#111', whiteSpace: 'nowrap', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', fontFamily: "'Noto Sans KR', sans-serif" }}>🚌 버스 15분</div>
+                </div>
+
+                {/* 이동 배지: 17분 8분마다 */}
+                <div style={{ position: 'absolute', top: '58%', left: '40%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.92)', border: '1.5px solid #e4e4de', borderRadius: 10, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#111', whiteSpace: 'nowrap', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', fontFamily: "'Noto Sans KR', sans-serif" }}>🚌 17분 · 8분마다</div>
+                </div>
+
+                {/* 이동 배지: 14분 */}
+                <div style={{ position: 'absolute', top: '73%', left: '18%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.92)', border: '1.5px solid #e4e4de', borderRadius: 10, padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#111', whiteSpace: 'nowrap', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', fontFamily: "'Noto Sans KR', sans-serif" }}>🚌 14분 · 10분마다</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* 비추천 안내 */}
+          <div style={{ marginTop: 28, background: '#fff', borderRadius: 22, padding: '18px 20px', border: '1px solid #ededE7' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 18 }}>⚠️</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>이런 분께는 비추천이에요</span>
+            </div>
+            {[
+              { e: '🌶', t: '향신료에 예민하신 분 — 중국 음식 코스가 포함되어 있어요' },
+              { e: '👶', t: '어린아이 동반 가족 — 도보 이동 구간이 있고 시장이 복잡해요' },
+            ].map((item, i, arr) => (
+              <div key={item.t} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: i < arr.length - 1 ? 10 : 0 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{item.e}</span>
+                <span style={{ fontSize: 13, color: '#52525b', lineHeight: 1.6 }}>{item.t}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ══ 플로팅 CTA ══ */}
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, padding: '18px 16px 28px', background: 'linear-gradient(to top, #EDECE6 55%, transparent)' }}>
+          <div style={{ maxWidth: 480, margin: '0 auto' }}>
+            <button
+              className="cta-btn"
+              onClick={() => setShowStamp(true)}
+              style={{ width: '100%', padding: '17px 24px', background: '#111', color: '#fff', border: 'none', borderRadius: 18, cursor: 'pointer', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, boxShadow: '0 4px 28px rgba(0,0,0,0.22)', fontFamily: 'inherit' }}
+            >
+              <span style={{ fontSize: 18 }}>🎯</span>
+              스탬프 도전하기
+              <span style={{ fontSize: 11, background: 'rgba(255,255,255,0.14)', borderRadius: 8, padding: '2px 9px', fontWeight: 500 }}>카카오 로그인</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 모달 */}
+        {selectedPlace && <DetailModal place={selectedPlace} onClose={() => setSelectedPlace(null)} />}
+        {showStamp && <StampModal onClose={() => setShowStamp(false)} />}
+      </div>
+    );
+  };
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
