@@ -776,18 +776,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     };
 
-    // 스탬프 챌린지 페이지 진입 시 로그인 체크
-    const handleStartChallenge = () => {
-      if (!user) {
-        handleKakaoLogin();
-      } else {
-        setView('stamp');
-      }
-    };
-
-    // 사진 압축 및 업로드 + 스탬프 등록 (S-004)
-    const handlePhotoUpload = async (event, placeId) => {
-      const file = event.target.files[0];
+    const handleStartChallenge = () => { setView('stamp'); };= event.target.files[0];
       if (!file) return;
 
       if (!supabaseClient || !user) {
