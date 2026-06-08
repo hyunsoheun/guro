@@ -893,9 +893,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
               <button onClick={handleLogout} style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, color: '#f87171', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>로그아웃</button>
             </div>
           ) : (
-            <button onClick={handleKakaoLogin} style={{ padding: '6px 12px', background: '#FEE500', border: 'none', borderRadius: 8, color: '#111', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
-              로그인
-            </button>
+            <button onClick={handleStartChallenge} style={{ padding: '6px 14px', background: '#D97706', border: 'none', borderRadius: 8, color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>&#x1F4F8; 스탬프</button>
           )}
           <button onClick={() => setShowSettings(true)} style={{ background: 'none', border: 'none', color: '#888', fontSize: 16, cursor: 'pointer', padding: 4 }}>⚙️</button>
         </div>
@@ -1016,7 +1014,6 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             >
               <span style={{ fontSize: 16 }}>📸</span>
               사진으로 스탬프 인증하기
-              {!user && <span style={{ fontSize: 11, background: 'rgba(255,255,255,0.15)', borderRadius: 6, padding: '2px 8px' }}>카카오 로그인</span>}
             </button>
           </div>
 
