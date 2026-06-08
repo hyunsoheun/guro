@@ -1,1 +1,1283 @@
-<!DOCTYPE html><html lang="ko"><head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="theme-color" content="#111111"> <title>온가족 빅재미 in 구로 — 서울 속 이색 반나절 코스</title> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"> <!-- React & Babel CDN --> <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script> <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script> <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script> <!-- Supabase JS Client & Image Compression CDN --> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.min.js"></script> <style> *, ::before, ::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; } html { scroll-behavior: smooth; } body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #EDECE6; min-height: 100vh; -webkit-font-smoothing: antialiased; } ::-webkit-scrollbar { display: none; } * { scrollbar-width: none; } @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } @keyframes cardIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } } @keyframes stampPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.35); } 60% { box-shadow: 0 0 0 7px rgba(217,119,6,0); } } .place-btn { transition: transform 0.14s ease, box-shadow 0.14s ease; } .place-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important; } .place-btn:active { transform: scale(0.985) !important; } .stamp-preview-btn { transition: transform 0.14s ease, opacity 0.14s; } .stamp-preview-btn:hover { opacity: 0.85; transform: scale(1.03); } .stamp-preview-btn:active { transform: scale(0.97); } .cta-btn { transition: opacity 0.14s, transform 0.14s; } .cta-btn:hover { opacity: 0.9; } .cta-btn:active { transform: scale(0.98); } .kakao-btn { transition: opacity 0.14s, transform 0.14s; } .kakao-btn:hover { opacity: 0.88; } .kakao-btn:active { transform: scale(0.98); } .close-btn:hover { background: #e4e4e7 !important; } .tag-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; border-radius: 20px; padding: 3px 10px; } </style></head><body><div id="root"></div><script type="text/babel">const SUPABASE_URL = 'https://lauinpnaaxqscpllvqwr.supabase.co';const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhdWlucG5hYXhxc2NwbGx2cXdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTA1NDMsImV4cCI6MjA5NjA4NjU0M30.R5PNH38_NL8Jp7cbKCUVurr35jerSShLDnloMpxblhw';const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); const { useState, useEffect, useCallback, useRef } = React; const DEFAULT_PLACES = [ { id: 'lunch', order: 1, name: 'G타워몰', category: '점심 식사', duration: '1시간', budget: 15000, budgetLabel: '대략 인당 ₩15,000', description: 'G타워몰 - 계절과 상관없이 즐기는 실내 맛집들', detail: 'G타워 내에 위치한 깔끔하고 다양한 식당가.', address: '서울시 구로구 디지털로 26길 38 G-Tower', mapUrl: 'https://map.naver.com/v5/search/G타워몰 구로디지털단지', transport: '구로 디지털 단지역 1번 출구 도보 15분', tip: '🅿️ 주차 안내: 매장별로 2시간 무료 주차 가능', website: 'https://g-tower.co.kr/', emoji: '🍜', bg: '#FFF3E0', accent: '#E65100', isRequired: false, photo: 'uploads/캡처21.PNG', photos: ['uploads/캡처21.PNG', 'uploads/캡처24.PNG', 'uploads/20260527_082743.jpg'], }, { id: 'netmarble', order: 2, name: '넷마블 게임 박물관', category: '게임 체험', duration: '1시간 30분', budget: 10000, budgetLabel: '성인 ₩10,000 / 초등 ₩7,000', description: '레트로 오락실부터 최신 게임까지!', detail: 'G타워 3층 게임 테마 뮤지엄.', address: '서울 구로구 디지털로 242', transport: '구로 디지털 단지역에서 도보로 15분', tip: '2층 레트로 오락실 최고!', hours: '10:00 ~ 18:00 (월요일 휴관)', mapUrl: 'https://map.naver.com/v5/search/넷마블게임박물관', emoji: '🎮', bg: '#EDE7F6', accent: '#4527A0', isRequired: true, photo: 'uploads/게임박물관2-75ac5fbd.jpg', website: 'https://netmarblegamemuseum.org/ko', photos: ['uploads/게임박물관2-75ac5fbd.jpg', 'uploads/20260527_100856.jpg'], }, { id: 'market', order: 3, name: '남구로 시장', category: '시장 탐방', duration: '1시간', budget: 10000, budgetLabel: '대략 ₩10,000', description: '남구로 시장!', detail: '서울 한복판의 작은 중국.', address: '구로구 구로동 730번지 일대', mapUrl: 'https://map.naver.com/v5/search/남구로시장', transport: '이전 장소에서 버스로 15분', emoji: '🏮', bg: '#FFEBEE', accent: '#C62828', isRequired: true, photo: 'uploads/남구로시장1.jpg', }, { id: 'restaurant', order: 4, name: '린궁즈멘관', category: '중국 정통 음식', duration: '40분', budget: 10000, budgetLabel: '대략 ₩10,000', description: '여권없이 가는 해외맛집', detail: '정통 중국 음식점.', stampLabel: '남구로 시장내 식당', address: '남구로 시장 입구', mapUrl: 'https://map.naver.com/v5/search/린궁즈멘관', transport: '남구로 시장에서 도보 3분', emoji: '🥟', bg: '#FCE4EC', accent: '#AD1457', isRequired: true, photo: 'uploads/린궁즈멘관.jpg', }, { id: 'bakery', order: 5, name: '중국 베이커리', category: '스탬프 완주 사은품 수령', duration: '20분', budget: 5000, budgetLabel: '대략 ₩5,000~', description: '마지막 스탬프! 호떡으로 마무리.', detail: '완주 사은품 수령 장소.', address: '남구로 시장 입구', mapUrl: 'https://map.naver.com/v5/search/남구로시장 구로구', transport: '이전 장소에서 1분 도보', emoji: '🧁', bg: '#FFF9C4', accent: '#E65100', isRequired: false, isFinal: true, photo: 'uploads/중국빵.jpg', }, ]; const App = () => { const [places] = useState(DEFAULT_PLACES); const [selectedPlace, setSelectedPlace] = useState(null); return ( <div style={{ background: '#EDECE6', minHeight: '100vh' }}> <div style={{ background: '#111', padding: '14px 22px' }}><span style={{ color: '#fff', fontSize: 16, fontWeight: 900 }}>📍 구로 반나절</span></div> <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 15px' }}> {places.map((place) => ( <div key={place.id} style={{ background: '#fff', borderRadius: 18, padding: 14, marginBottom: 12, display: 'flex', gap: 12, cursor: 'pointer' }} onClick={() => setSelectedPlace(place)}> <div style={{ fontSize: 36 }}>{place.emoji}</div> <div><div style={{ fontWeight: 700 }}>{place.name}</div><div style={{ fontSize: 13, color: '#52525b' }}>{place.description}</div></div> </div> ))} </div> </div> ); }; ReactDOM.createRoot(document.getElementById('root')).render(<App />);</script></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#111111">
+  <title>온가족 빅재미 in 구로 — 서울 속 이색 반나절 코스</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- React & Babel CDN -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+  
+  <!-- Supabase JS Client & Image Compression CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.min.js"></script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans KR', -apple-system, sans-serif; background: #EDECE6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    ::-webkit-scrollbar { display: none; }
+    * { scrollbar-width: none; }
+
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes stampPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.35); }
+      60% { box-shadow: 0 0 0 7px rgba(217,119,6,0); }
+    }
+
+    .place-btn { transition: transform 0.14s ease, box-shadow 0.14s ease; }
+    .place-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important; }
+    .place-btn:active { transform: scale(0.985) !important; }
+
+    .stamp-preview-btn { transition: transform 0.14s ease, opacity 0.14s; }
+    .stamp-preview-btn:hover { opacity: 0.85; transform: scale(1.03); }
+    .stamp-preview-btn:active { transform: scale(0.97); }
+
+    .cta-btn { transition: opacity 0.14s, transform 0.14s; }
+    .cta-btn:hover { opacity: 0.9; }
+    .cta-btn:active { transform: scale(0.98); }
+
+    .kakao-btn { transition: opacity 0.14s, transform 0.14s; }
+    .kakao-btn:hover { opacity: 0.88; }
+    .kakao-btn:active { transform: scale(0.98); }
+
+    .close-btn:hover { background: #e4e4e7 !important; }
+
+    .tag-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; border-radius: 20px; padding: 3px 10px; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const SUPABASE_URL = 'https://lauinpnaaxqscpllvqwr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxhdWlucG5hYXhxc2NwbGx2cXdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MTA1NDMsImV4cCI6MjA5NjA4NjU0M30.R5PNH38_NL8Jp7cbKCUVurr35jerSShLDnloMpxblhw';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { useState, useEffect, useCallback, useRef } = React;
+
+  /* ─── 로컬 폴백 장소 데이터 (DB 데이터 부재 시 사용) ─── */
+  const DEFAULT_PLACES = [
+    {
+      id: 'lunch', order: 1,
+      name: 'G타워몰',
+      category: '점심 식사', duration: '1시간', budget: 15000, budgetLabel: '대략 인당 ₩15,000',
+      description: 'G타워몰 - 계절과 상관없이 즐기는 실내 맛집들',
+      detail: 'G타워 내에 위치한 깔끔하고 다양한 식당가. 직장인, 가족단위 모두 만족해요. 코스 출발 전 에너지 충전 필수!',
+      address: '서울시 구로구 디지털로 26길 38 G-Tower',
+      mapUrl: 'https://map.naver.com/v5/search/G타워몰 구로디지털단지',
+      transport: '구로 디지털 단지역 1번 출구 도보 15분 혹은 버스 이용',
+      tip: '🅿️ 주차 안내: 상업시설 G-Tower Mall 매장 이용 시 매장별로 2시간 무료 주차 가능',
+      website: 'https://g-tower.co.kr/',
+      emoji: '🍜', bg: '#FFF3E0', accent: '#E65100', isRequired: false,
+      photo: 'uploads/캡처21.PNG',
+      photos: ['uploads/캡처21.PNG', 'uploads/캡처24.PNG', 'uploads/캡쳐22.PNG', 'uploads/20260527_082743.jpg', 'uploads/20260527_082921.jpg'],
+    },
+    {
+      id: 'netmarble', order: 2,
+      name: '넷마블 게임 박물관',
+      category: '게임 체험', duration: '1시간 30분', budget: 10000, budgetLabel: '대략 성인 ₩10,000 / 초등 ₩7,000',
+      description: '레트로 오락실부터 최신 게임까지. 코스 최고 하이라이트!',
+      detail: 'G타워 3층에 위치한 게임 테마 뮤지엄. 80~90년대 오락실 게임기를 직접 체험하고 레트로 게임의 추억을 되살릴 수 있어요. 게임을 잘 몰라도 충분히 재미있는 공간.',
+      address: '서울 구로구 디지털로 242',
+      transport: '구로 디지털 단지역에서 도보로 15분',
+      tip: '2층 레트로 오락실 코너가 최고의 인증샷 포인트! 줄 설 수 있으니 오전 방문 추천.',
+      hours: '10:00 ~ 18:00 (월요일 휴관)',
+      mapUrl: 'https://map.naver.com/v5/search/넷마블게임박물관',
+      emoji: '🎮', bg: '#EDE7F6', accent: '#4527A0', isRequired: true,
+      photo: 'uploads/게임박물관2-75ac5fbd.jpg',
+      website: 'https://netmarblegamemuseum.org/ko',
+      photos: ['uploads/게임박물관2-75ac5fbd.jpg', 'uploads/20260527_100856.jpg', 'uploads/20260527_100943-a2ef73dd.jpg', 'uploads/캡처25.PNG', 'uploads/캡처26.PNG'],
+    },
+    {
+      id: 'coffee', order: 3,
+      name: '커피 브레이크',
+      category: '카페 휴식', duration: '30분', budget: 7000, budgetLabel: '대략 ₩7,000',
+      description: '박물관 관람 중간에 쉬어가는 달콤한 휴식.',
+      detail: '넷마블 게임 박물관 관람 후 인근 카페에서 잠깐 쉬어가요. 구로디지털단지 일대에는 개성 있는 카페들이 많아요. 다음 이동을 위한 에너지 충전!',
+      address: 'G타워몰 내부',
+      mapUrl: 'https://map.naver.com/v5/search/G타워몰 구로디지털단지',
+      transport: '이전 장소에서 도보 5분',
+      tip: '간단한 디저트와 함께하면 더욱 좋아요.',
+      emoji: '☕', bg: '#FFF8E1', accent: '#D84315', isRequired: false,
+      photo: 'uploads/캡처29.PNG',
+      photos: ['uploads/캡처29.PNG', 'uploads/thumb-8f803855f4d7dcaa8218e57fce514cd0_wAvY6l1g_4baae7db4c1cfd94286f07872d767e566c75a452_330x330-a9846b8c.jpg', 'uploads/캡처27.PNG', 'uploads/캡처28.PNG'],
+    },
+    {
+      id: 'gvalley', order: 4,
+      name: 'G밸리 산업 박물관',
+      category: '역사 체험', duration: '1시간', budget: 0, budgetLabel: '무료',
+      description: 'G밸리 산업 박물관 - 아이들은 역사 배움터, 어른들은 레트로 여행',
+      detail: '1960년대~현재까지 구로공단에서 구로디지털 밸리까지의 역사를 담은 박물관. 당시 공장 노동자들의 삶과 한국 산업화 역사를 VR 체험을 포함해 생생하게 느낄 수 있어요. 무료라는 게 믿기지 않을 정도로 알찬 구성.',
+      address: 'G타워 3층',
+      mapUrl: 'https://map.naver.com/v5/search/G밸리산업박물관',
+      transport: '이전 장소에서 도보 5분내',
+      tip: 'VR 체험 대기가 생길 수 있으니 미리 대기 등록 추천.',
+      hours: '09:00 ~ 18:00 (월요일 휴관)',
+      website: 'https://www.seoul.go.kr/museumg/index.do',
+      emoji: '🏭', bg: '#E3F2FD', accent: '#1565C0', isRequired: false,
+      photo: 'uploads/산업박물관 vr.jpg',
+      photos: ['uploads/산업박물관 vr.jpg', 'uploads/20260527_101235.jpg', 'uploads/20260527_101448.jpg', 'uploads/20260527_101611.jpg', 'uploads/20260527_102111.jpg', 'uploads/산업박물관2 vr.jpg', 'uploads/산업박물관3 vr.jpg', 'uploads/산업박물곤4.jpg'],
+    },
+    {
+      id: 'market', order: 5,
+      name: '남구로 시장',
+      category: '시장 탐방', duration: '1시간', budget: 10000, budgetLabel: '대략 ₩10,000',
+      description: '남구로 시장 - 안전하면서도 신기한 거 투성이, 장을 봐가도 좋아요',
+      detail: '색안경만 빼고 보면 서울 한복판의 작은 중국. 중국 식재료와 간판, 거리 분위기가 마치 중국 소도시에 온 듯한 이색 경험을 선사해요. 다양한 중국 간식을 저렴하게 맛볼 수 있고 골목 구석구석 탐방하는 재미가 있어요.',
+      address: '구로구 구로동 730번지 일대 (고대구로병원 옆)',
+      mapUrl: 'https://map.naver.com/v5/search/남구로시장',
+      transport: '이전 장소에서 버스로 15분',
+      tip: '🅿️ 주차: 남구로 시장, 구로4동 공동 공영 주차장 / 5분당 100원 / 감면 혜택 있음 / 시장에서 1만원 이상 구매 시 무료 주차권',
+      emoji: '🏮', bg: '#FFEBEE', accent: '#C62828', isRequired: true,
+      photo: 'uploads/남구로시장1.jpg',
+      photos: ['uploads/남구로시장1.jpg', 'uploads/남구로시장 2.jpg', 'uploads/남구로시장3.jpg', 'uploads/남구로시장4.jpg', 'uploads/남구로시장-335e64a3.jpg', 'uploads/남구로시장6-dde64f7f.jpg', 'uploads/남구로시장 2-61cb711d.jpg'],
+    },
+    {
+      id: 'restaurant', order: 6,
+      name: '린궁즈멘관',
+      category: '중국 정통 음식', duration: '40분', budget: 10000, budgetLabel: '대략 ₩10,000',
+      description: '여권없이 가는 해외맛집',
+      detail: '깔끔하고 맛있어요 😊 남구로 시장 인근에 위치한 정통 중국 음식점. 중국 현지 요리사가 만드는 본토 맛으로 유명해요. 양이 푸짐하고 가격도 착한 편. 중국 음식을 제대로 맛보고 싶다면 꼭 방문.',
+      tagline: '깔끔하고 맛있어요 👍',
+      stampLabel: '남구로 시장내 식당',
+      address: '남구로 시장 입구',
+      mapUrl: 'https://map.naver.com/v5/search/린궁즈멘관',
+      transport: '남구로 시장에서 도보 3분',
+      tip: '🅿️ 주차: 남구로 시장, 구로4동 공동 공영 주차장 / 5분당 100원 / 감면 혜택 있음 / 시장에서 1만원 이상 구매 시 무료 주차권',
+      hours: '11:00 ~ 21:00',
+      emoji: '🥟', bg: '#FCE4EC', accent: '#AD1457', isRequired: true,
+      photo: 'uploads/린궁즈멘관.jpg',
+      photos: ['uploads/린궁즈멘관.jpg', 'uploads/린궁즈멘관2.jpg', 'uploads/20260527_113544.jpg', 'uploads/20260527_112612.jpg', 'uploads/린궁즈멘관 메뉴판.jpg'],
+    },
+    {
+      id: 'bakery', order: 7,
+      name: '중국 베이커리',
+      category: '스탬프 완주 사은품 수령 장소', duration: '20분', budget: 5000, budgetLabel: '대략 ₩5,000~',
+      description: '마지막 스탬프 장소! 호떡으로 달콤하게 마무리.',
+      detail: '구로 반나절 코스의 피날레. 핵심 3곳 스탬프를 완료한 후 이곳에서 완주 사은품(중국 호떡 1개)을 받을 수 있어요. 중국식 호떡과 각종 호빵이 인기 메뉴.',
+      address: '남구로 시장 입구',
+      mapUrl: 'https://map.naver.com/v5/search/남구로시장 구로구',
+      transport: '이전 장소에서 1분 도보',
+      emoji: '🧁', bg: '#FFF9C4', accent: '#E65100', isRequired: false, isFinal: true,
+      photo: 'uploads/중국빵.jpg',
+    },
+  ];
+
+  /* ─── 사진 컴포넌트 ─── */
+  const PhotoThumb = ({ place, size = 72, radius = 10 }) => (
+    <div style={{
+      width: size, height: size, borderRadius: radius,
+      background: place.bg, flexShrink: 0, overflow: 'hidden', position: 'relative',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {place.photo ? (
+        <img src={place.photo} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', padding: '4px' }} />
+      ) : (
+        <>
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden="true">
+            <defs>
+              <pattern id={'th_' + place.id} width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="9" stroke={place.accent} strokeWidth="1" opacity="0.12" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={'url(#th_' + place.id + ')'} />
+          </svg>
+          <span style={{ fontSize: size * 0.38, position: 'relative', zIndex: 1, lineHeight: 1 }}>{place.emoji}</span>
+        </>
+      )}
+    </div>
+  );
+
+  const PhotoHero = ({ place }) => {
+    const [active, setActive] = useState(0);
+    const gallery = place.photos || (place.photo ? [place.photo] : null);
+    if (!gallery) return (
+      <div style={{ height: 220, background: place.bg, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} aria-hidden="true">
+          <defs>
+            <pattern id={'mh_' + place.id} width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="14" stroke={place.accent} strokeWidth="1.5" opacity="0.1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill={'url(#mh_' + place.id + ')'} />
+        </svg>
+        <span style={{ fontSize: 88, position: 'relative', zIndex: 1, lineHeight: 1 }}>{place.emoji}</span>
+        <div style={{ position: 'absolute', bottom: 12, right: 14, zIndex: 2, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(6px)', borderRadius: 8, padding: '3px 9px', fontSize: 11, color: '#71717a' }}>실사진 준비 중</div>
+      </div>
+    );
+    return (
+      <div style={{ position: 'relative', background: place.bg }}>
+        <div style={{ height: 240, overflow: 'hidden', position: 'relative' }}>
+          <img src={gallery[active]} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', transition: 'opacity 0.2s' }} />
+        </div>
+        {gallery.length > 1 && (
+          <div style={{ display: 'flex', gap: 8, padding: '10px 14px', overflowX: 'auto', background: '#fff' }}>
+            {gallery.map((src, i) => (
+              <button key={i} onClick={() => setActive(i)} style={{ flexShrink: 0, width: 60, height: 60, borderRadius: 10, overflow: 'hidden', border: active === i ? '2.5px solid #D97706' : '2px solid #e4e4de', padding: 0, cursor: 'pointer', background: 'none', transition: 'border 0.15s' }}>
+                <img src={src} alt={place.name + ' ' + (i + 1)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ─── 장소 카드 ─── */
+  const PlaceCard = ({ place, idx, onSelect }) => {
+    const isLast = place.order === DEFAULT_PLACES.length;
+    return (
+      <div style={{ display: 'flex', animation: `cardIn 0.38s ease ${idx * 0.06}s both` }}>
+        {/* 타임라인 */}
+        <div style={{ width: 46, display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+            background: place.isRequired ? '#D97706' : '#ddddd7',
+            color: place.isRequired ? '#fff' : '#888880',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 13, fontWeight: 700, zIndex: 1,
+            animation: place.isRequired ? 'stampPulse 2.4s 1s infinite' : 'none',
+          }}>{place.order}</div>
+          {!isLast && (
+            <div style={{
+              width: 2, flex: 1, minHeight: 20, marginTop: 5, marginBottom: 5,
+              background: 'repeating-linear-gradient(to bottom, #c8c8c2 0 4px, transparent 4px 9px)',
+            }} />
+          )}
+        </div>
+
+        {/* 카드 */}
+        <button
+          className="place-btn"
+          onClick={() => onSelect(place)}
+          style={{
+            flex: 1, textAlign: 'left', background: '#fff', border: 'none',
+            cursor: 'pointer', borderRadius: 18, padding: '14px 14px 14px 4px',
+            display: 'flex', gap: 12, alignItems: 'flex-start',
+            marginBottom: isLast ? 0 : 12,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            position: 'relative', overflow: 'hidden', fontFamily: 'inherit',
+          }}
+        >
+          {place.isRequired && (
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: '#D97706', borderRadius: '0 2px 2px 0' }} />
+          )}
+          <div style={{ paddingLeft: place.isRequired ? 8 : 0, flex: 1, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+            <PhotoThumb place={place} size={72} radius={11} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 11, color: '#888880', fontWeight: 500 }}>{place.category}</span>
+                {place.isRequired && (
+                  <span style={{ fontSize: 10, background: '#D97706', color: '#fff', borderRadius: 5, padding: '1px 7px', fontWeight: 700, flexShrink: 0 }}>★ 스탬프</span>
+                )}
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#111', marginBottom: 5, lineHeight: 1.3 }}>{place.name}</div>
+              <div style={{ fontSize: 13, color: '#52525b', lineHeight: 1.55, marginBottom: 9 }}>{place.description}</div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span style={{ fontSize: 11, color: '#888880' }}>⏱ {place.duration}</span>
+                <span style={{ color: '#d4d4ce' }}>·</span>
+                <span style={{ fontSize: 11, color: place.budget === 0 ? '#059669' : '#888880', fontWeight: place.budget === 0 ? 700 : 400 }}>
+                  {place.budget === 0 ? '● 무료' : place.budgetLabel}
+                </span>
+              </div>
+            </div>
+            <span style={{ color: '#c8c8c2', fontSize: 20, alignSelf: 'center', flexShrink: 0, paddingRight: 2, lineHeight: 1 }}>›</span>
+          </div>
+        </button>
+      </div>
+    );
+  };
+
+  /* ─── 상세 모달 ─── */
+  const DetailModal = ({ place, onClose }) => {
+    useEffect(() => {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      const onKey = e => { if (e.key === 'Escape') onClose(); };
+      window.addEventListener('keydown', onKey);
+      return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); };
+    }, [onClose]);
+
+    const stats = [
+      { icon: '⏱', val: place.duration, label: '소요 시간', green: false },
+      { icon: place.budget === 0 ? '🎁' : '💰', val: place.budgetLabel, label: '예상 비용', green: place.budget === 0 },
+      ...(place.hours ? [{ icon: '🕐', val: place.hours, label: '운영 시간', green: false }] : []),
+    ];
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.52)', animation: 'fadeIn 0.2s' }} />
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            position: 'relative', zIndex: 1, background: '#fff',
+            borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 480,
+            maxHeight: '91vh', overflowY: 'auto', overflowX: 'hidden',
+            animation: 'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',
+          }}
+        >
+          {/* 핸들 */}
+          <div style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10, padding: '12px 0 6px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: '#e4e4de' }} />
+          </div>
+
+          <PhotoHero place={place} />
+
+          <div style={{ padding: '20px 20px 52px' }}>
+            {/* 타이틀 */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+              <div style={{ flex: 1, marginRight: 12 }}>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, background: place.bg, color: place.accent, borderRadius: 6, padding: '3px 10px', fontWeight: 600 }}>{place.category}</span>
+                  {place.isRequired && (
+                    <span style={{ fontSize: 11, background: '#D97706', color: '#fff', borderRadius: 6, padding: '3px 10px', fontWeight: 700 }}>★ 스탬프 필수</span>
+                  )}
+                </div>
+                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111', lineHeight: 1.2 }}>{place.name}{place.tagline && <span style={{ fontSize: 13, fontWeight: 500, color: '#71717a', marginLeft: 8 }}>{place.tagline}</span>}</h2>
+              </div>
+              <button
+                className="close-btn"
+                onClick={onClose}
+                style={{ width: 36, height: 36, borderRadius: '50%', background: '#f4f4f0', border: 'none', cursor: 'pointer', fontSize: 14, color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontFamily: 'inherit', transition: 'background 0.14s' }}
+              >✕</button>
+            </div>
+
+            {/* 통계 */}
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+              {stats.map((s, i) => (
+                <div key={i} style={{ flex: 1, background: s.green ? '#f0fdf4' : '#f7f7f3', borderRadius: 14, padding: '13px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, marginBottom: 5 }}>{s.icon}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: s.green ? '#059669' : '#111', lineHeight: 1.3, marginBottom: 3 }}>{s.val}</div>
+                  <div style={{ fontSize: 10, color: '#888880' }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* 설명 */}
+            <p style={{ fontSize: 15, color: '#3f3f46', lineHeight: 1.78, marginBottom: 22 }}>{place.detail}</p>
+
+            {/* 정보 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>📍</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 11, color: '#888880', marginBottom: 2 }}>주소</div>
+                  <div style={{ fontSize: 14, color: '#111', lineHeight: 1.5, marginBottom: 6 }}>{place.address}</div>
+                  {place.mapUrl && (
+                    <a href={place.mapUrl} target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#03C75A', color: '#fff', borderRadius: 8, padding: '5px 12px', fontSize: 12, fontWeight: 700, textDecoration: 'none', fontFamily: 'inherit' }}>
+                      <span>🗺</span> 네이버 지도에서 보기
+                    </a>
+                  )}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>🚶</span>
+                <div>
+                  <div style={{ fontSize: 11, color: '#888880', marginBottom: 2 }}>이동 방법</div>
+                  <div style={{ fontSize: 14, color: '#111', lineHeight: 1.5 }}>{place.transport}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 팁 */}
+            {place.tip && (
+              <div style={{ marginTop: 16, background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: 14, padding: '14px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>💡</span>
+                <p style={{ fontSize: 13, color: '#92400e', lineHeight: 1.65 }}>{place.tip}</p>
+              </div>
+            )}
+
+            {/* 웹사이트 바로가기 */}
+            {place.website && (
+              <a
+                href={place.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+                  background: '#f7f7f3', border: '1.5px solid #e4e4de', borderRadius: 16,
+                  padding: '14px 20px', textDecoration: 'none',
+                }}
+              >
+                <span style={{ fontSize: 20 }}>🏢</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>{place.name} 공식 홈페이지 바로가기</span>
+                <span style={{ fontSize: 13, color: '#888880' }}>→</span>
+              </a>
+            )}
+
+            {/* 완주 배너 */}
+            {place.isFinal && (
+              <div style={{ marginTop: 20, background: '#D97706', borderRadius: 18, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center' }}>
+                <span style={{ fontSize: 34, flexShrink: 0 }}>🎉</span>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 5 }}>스탬프 완주 사은품 수령 장소</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6 }}>핵심 3곳에서 얼굴이 찍힌 사진을 점원에게 보여주면 스탬프 완료 인정</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ─── 설정 모달 ─── */
+  const SettingsModal = ({ isOpen, onClose, config, onSave }) => {
+    const [url, setUrl] = useState(config.supabaseUrl || '');
+    const [key, setKey] = useState(config.supabaseAnonKey || '');
+    const [naverKey, setNaverKey] = useState(config.naverClientId || '');
+
+    if (!isOpen) return null;
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSave({ supabaseUrl: url, supabaseAnonKey: key, naverClientId: naverKey });
+      onClose();
+    };
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }} onClick={onClose} />
+        <form onSubmit={handleSubmit} style={{ position: 'relative', zIndex: 1, background: '#fff', width: '100%', maxWidth: 400, borderRadius: 20, padding: 24, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: '#111', marginBottom: 16 }}>⚙️ Supabase 및 외부 API 설정</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#52525b', marginBottom: 5 }}>Supabase URL</label>
+              <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://xxxx.supabase.co" required style={{ width: '100%', padding: '10px 12px', border: '1px solid #d4d4d8', borderRadius: 8, fontSize: 13, fontFamily: 'inherit' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#52525b', marginBottom: 5 }}>Supabase Anon Key</label>
+              <input type="text" value={key} onChange={e => setKey(e.target.value)} placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required style={{ width: '100%', padding: '10px 12px', border: '1px solid #d4d4d8', borderRadius: 8, fontSize: 13, fontFamily: 'inherit' }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#52525b', marginBottom: 5 }}>Kakao Map Javascript API Key (선택)</label>
+              <input type="text" value={kakaoKey} onChange={e => setKakaoKey(e.target.value)} placeholder="Kakao 앱 JavaScript 키" style={{ width: '100%', padding: '10px 12px', border: '1px solid #d4d4d8', borderRadius: 8, fontSize: 13, fontFamily: 'inherit' }} />
+            </div>
+          </div>
+
+          <p style={{ fontSize: 11, color: '#71717a', lineHeight: 1.5, marginBottom: 20 }}>
+            ※ 설정값은 브라우저 로컬 스토리지에 안전하게 저장됩니다. 설정 후 데이터 로드를 위해 새로고침됩니다.
+          </p>
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" onClick={onClose} style={{ flex: 1, padding: '11px', background: '#f4f4f5', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#52525b', fontFamily: 'inherit' }}>취소</button>
+            <button type="submit" style={{ flex: 1, padding: '11px', background: '#111', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#fff', fontFamily: 'inherit' }}>저장 및 적용</button>
+          </div>
+        </form>
+      </div>
+    );
+  };
+
+  /* ─── 메인 앱 ─── */
+  const App = () => {
+    const [view, setView] = useState('landing'); // 'landing' | 'stamp' | 'upload' | 'complete'
+    const [selectedPlace, setSelectedPlace] = useState(null);
+    const [uploadPlace, setUploadPlace] = useState(null);
+    
+    // Supabase 설정 관리
+    const [config, setConfig] = useState(() => {
+      return {
+        supabaseUrl: localStorage.getItem('guro_supabase_url') || SUPABASE_URL || '',
+        supabaseAnonKey: localStorage.getItem('guro_supabase_anon_key') || SUPABASE_ANON_KEY || '',
+        naverClientId: localStorage.getItem('guro_naver_client_id') || '',
+      };
+    });
+    const [showSettings, setShowSettings] = useState(false);
+    const [supabaseClient, setSupabaseClient] = useState(null);
+    
+    // 비즈니스 데이터 상태
+    const [places, setPlaces] = useState(DEFAULT_PLACES);
+    const [user, setUser] = useState(null);
+    const [stamps, setStamps] = useState({}); // { [placeId]: photoUrl }
+    const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    
+    // 카카오맵 동적 로딩 참조
+    const mapContainerRef = useRef(null);
+    const mapLoadedRef = useRef(false);
+
+    // Supabase Client 생성/변경 감지
+    useEffect(() => {
+      if (config.supabaseUrl && config.supabaseAnonKey) {
+        try {
+          // 설정이 기본값과 같으면 이미 생성된 클라이언트 재사용, 다르면 새로 생성
+          const isSameAsDefault =
+            config.supabaseUrl === SUPABASE_URL &&
+            config.supabaseAnonKey === SUPABASE_ANON_KEY;
+          const client = isSameAsDefault
+            ? supabase
+            : window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+          setSupabaseClient(client);
+        } catch (e) {
+          console.warn("Supabase client 생성 실패, 기본 클라이언트 사용:", e);
+          setSupabaseClient(supabase);
+        }
+      } else {
+        setSupabaseClient(null);
+      }
+    }, [config]);
+
+    // 카카오 OAuth 콜백 및 로그인 상태 파싱
+    useEffect(() => {
+      if (!supabaseClient) return;
+
+      const handleAuth = async () => {
+        // 현재 세션 가져오기
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session) {
+          setUser(session.user);
+          // 리다이렉트되어 들어오는 해시 정보 제거
+          if (window.location.hash.includes('access_token')) {
+            window.history.replaceState(null, document.title, window.location.pathname);
+          }
+          
+          // 사용자 프로필 Upsert
+          const { user_metadata } = session.user;
+          const nickname = user_metadata?.name || user_metadata?.full_name || '모험가';
+          const kakao_id = session.user.identities?.[0]?.id || session.user.id;
+          
+          await supabaseClient.from('user_profiles').upsert({
+            id: session.user.id,
+            kakao_id: kakao_id.toString(),
+            nickname: nickname
+          });
+          
+          // 유저 스탬프 가져오기
+          fetchUserStamps(session.user.id);
+        }
+
+        // 로그인 상태 변경 이벤트 구독
+        const { data: { subscription } } = supabaseClient.auth.onAuthStateChange((_event, session) => {
+          if (session) {
+            setUser(session.user);
+            fetchUserStamps(session.user.id);
+          } else {
+            setUser(null);
+            setStamps({});
+          }
+        });
+
+        return () => subscription.unsubscribe();
+      };
+
+      handleAuth();
+    }, [supabaseClient]);
+
+    // 사용자 스탬프 목록 Fetch
+    const fetchUserStamps = async (userId) => {
+      if (!supabaseClient) return;
+      try {
+        const { data, error } = await supabaseClient
+          .from('stamps')
+          .select('place_id, photo_url')
+          .eq('user_id', userId);
+        
+        if (error) throw error;
+        
+        const stampMap = {};
+        data.forEach(s => {
+          stampMap[s.place_id] = s.photo_url;
+        });
+        setStamps(stampMap);
+      } catch (err) {
+        console.error("스탬프 로드 실패:", err);
+      }
+    };
+
+    // 장소 데이터 동적 Fetch (Supabase 연동 시)
+    useEffect(() => {
+      const loadPlaces = async () => {
+        if (!supabaseClient) {
+          setPlaces(DEFAULT_PLACES);
+          return;
+        }
+        try {
+          const { data, error } = await supabaseClient
+            .from('places')
+            .select('*')
+            .order('order_num', { ascending: true });
+          
+          if (error) throw error;
+          
+          if (data && data.length > 0) {
+            // 로컬의 메타데이터(사진, 컬러, 이모지 등)와 결합
+            const enriched = data.map(p => {
+              const local = DEFAULT_PLACES.find(l => l.order === p.order_num) || {};
+              return {
+                id: p.id,
+                name: local.name || p.name,
+                description: local.description || p.description,
+                address: local.address || p.address,
+                isRequired: local.isRequired !== undefined ? local.isRequired : p.is_required,
+                order: p.order_num,
+                category: local.category || '명소',
+                duration: local.duration || '30분',
+                budget: local.budget || 0,
+                budgetLabel: local.budgetLabel || '무료',
+                emoji: local.emoji || '📍',
+                bg: local.bg || '#F4F4F0',
+                accent: local.accent || '#71717a',
+                photo: local.photo,
+                photos: local.photos,
+                tip: local.tip,
+                isFinal: local.isFinal,
+                hours: local.hours,
+                transport: local.transport,
+                detail: local.detail,
+                tagline: local.tagline,
+                website: local.website,
+                stampLabel: local.stampLabel
+              };
+            });
+            setPlaces(enriched);
+          }
+        } catch (err) {
+          console.warn("DB 장소 로드 실패, 로컬 데이터로 대체:", err);
+          setPlaces(DEFAULT_PLACES);
+        }
+      };
+
+      loadPlaces();
+    }, [supabaseClient]);
+
+    // 카카오 맵 로드 & 초기화 (지연 로딩 적용)
+    useEffect(() => {
+      if (view !== 'landing') return;
+
+      const naverKey = config.naverClientId;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !mapLoadedRef.current) {
+            loadLeafletMap();
+            mapLoadedRef.current = true;
+          }
+        });
+      }, { threshold: 0.1 });
+
+      if (mapContainerRef.current) {
+        observer.observe(mapContainerRef.current);
+      }
+
+      return () => {
+        if (mapContainerRef.current) observer.unobserve(mapContainerRef.current);
+      };
+    }, [view]);
+
+    const loadLeafletMap = () => {
+      if (window.L) { initLeafletMap(); return; }
+      // Leaflet CSS
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+      // Leaflet JS
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = () => initLeafletMap();
+      document.head.appendChild(script);
+    };
+
+    const initLeafletMap = () => {
+      if (!mapContainerRef.current || !window.L) return;
+      if (mapContainerRef.current._leaflet_id) return; // 이미 초기화됨
+
+      const COORDS = {
+        1: { lat: 37.4800, lng: 126.8955 }, // G타워몰
+        2: { lat: 37.4803, lng: 126.8959 }, // 넷마블
+        3: { lat: 37.4797, lng: 126.8951 }, // 커피브레이크
+        4: { lat: 37.4795, lng: 126.8956 }, // G밸리
+        5: { lat: 37.4893, lng: 126.8912 }, // 남구로시장
+        6: { lat: 37.4890, lng: 126.8908 }, // 린궁즈멘관
+        7: { lat: 37.4887, lng: 126.8910 }  // 중국베이커리
+      };
+
+      const map = L.map(mapContainerRef.current, {
+        center: [37.4830, 126.8910],
+        zoom: 14,
+        zoomControl: true,
+        scrollWheelZoom: false
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+      }).addTo(map);
+
+      const colors = ['#D97706','#4527A0','#D84315','#1565C0','#C62828','#AD1457','#E65100'];
+
+      places.forEach((p, idx) => {
+        const coord = COORDS[p.order];
+        if (!coord) return;
+        const icon = L.divIcon({
+          html: `<div style="background:${colors[idx]};color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-family:sans-serif;">${p.order}</div>`,
+          className: '',
+          iconSize: [32, 32],
+          iconAnchor: [16, 16]
+        });
+        const marker = L.marker([coord.lat, coord.lng], { icon }).addTo(map);
+        marker.bindPopup(`<b style="font-size:13px">${p.name}</b>`);
+        marker.on('click', () => setSelectedPlace(p));
+      });
+    };
+
+    // 설정 값 로컬스토리지 저장 및 재로드
+    const handleSaveConfig = (newConfig) => {
+      localStorage.setItem('guro_supabase_url', newConfig.supabaseUrl);
+      localStorage.setItem('guro_supabase_anon_key', newConfig.supabaseAnonKey);
+      localStorage.setItem('guro_naver_client_id', newConfig.naverClientId);
+      setConfig(newConfig);
+      window.location.reload();
+    };
+
+    // 카카오 로그인 인증 호출
+    const handleKakaoLogin = async () => {
+      if (!supabaseClient) {
+        setShowSettings(true);
+        alert("카카오 로그인을 사용하려면 먼저 Supabase URL과 Key를 설정해주세요!");
+        return;
+      }
+      
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname
+        }
+      });
+
+      if (error) {
+        console.error("로그인 시도 에러:", error);
+        alert("카카오 로그인 실패. 설정을 다시 확인해 주세요.");
+      }
+    };
+
+    const handleLogout = async () => {
+      if (supabaseClient) {
+        await supabaseClient.auth.signOut();
+        setUser(null);
+        setStamps({});
+        setView('landing');
+      }
+    };
+
+    // 스탬프 챌린지 페이지 진입 시 로그인 체크
+    const handleStartChallenge = () => {
+      if (!user) {
+        handleKakaoLogin();
+      } else {
+        setView('stamp');
+      }
+    };
+
+    // 사진 압축 및 업로드 + 스탬프 등록 (S-004)
+    const handlePhotoUpload = async (event, placeId) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!supabaseClient || !user) {
+        alert("로그인 세션이 만료되었거나 설정이 올바르지 않습니다.");
+        return;
+      }
+
+      setUploading(true);
+
+      try {
+        // 1. 클라이언트 사이드 이미지 압축
+        const options = {
+          maxSizeMB: 1.5,
+          maxWidthOrHeight: 1280,
+          useWebWorker: true,
+        };
+        const compressedFile = await imageCompression(file, options);
+        
+        // 2. Storage 업로드
+        const fileExt = compressedFile.name.split('.').pop() || 'jpg';
+        const fileName = `${user.id}/${placeId}_${Date.now()}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+          .from('stamp-photos')
+          .upload(fileName, compressedFile, {
+            contentType: compressedFile.type,
+            upsert: true
+          });
+
+        if (uploadError) throw uploadError;
+
+        // 3. 사진 Public URL 가져오기
+        const { data: { publicUrl } } = supabaseClient.storage
+          .from('stamp-photos')
+          .getPublicUrl(fileName);
+
+        // 4. DB Stamps 테이블에 저장
+        const { error: dbError } = await supabaseClient
+          .from('stamps')
+          .upsert({
+            user_id: user.id,
+            place_id: placeId,
+            photo_url: publicUrl
+          });
+
+        if (dbError) throw dbError;
+
+        // 5. 완료된 스탬프 목록 최신화
+        await fetchUserStamps(user.id);
+        setUploadPlace(null);
+        setView('stamp');
+        alert("스탬프가 정상적으로 적립되었습니다!");
+
+        // 6. 완주 여부 즉시 검증
+        checkIfAllComplete();
+      } catch (err) {
+        console.error("업로드 에러:", err);
+        alert(`인증 업로드 실패: ${err.message || '다시 시도해 주세요.'}`);
+      } finally {
+        setUploading(false);
+      }
+    };
+
+    // 스탬프 완주 서버 측 검증 (RPC 호출)
+    const checkIfAllComplete = async () => {
+      if (!supabaseClient || !user) return;
+      try {
+        const { data: isComplete, error } = await supabaseClient.rpc('is_stamp_complete', {
+          p_user_id: user.id
+        });
+        
+        if (error) throw error;
+        
+        if (isComplete) {
+          setView('complete');
+        }
+      } catch (err) {
+        console.error("완주 상태 확인 실패:", err);
+        // DB Function 미생성 시 로컬 판정 폴백
+        const requiredIds = places.filter(p => p.isRequired).map(p => p.id);
+        const hasAll = requiredIds.every(id => stamps[id]);
+        if (hasAll) {
+          setView('complete');
+        }
+      }
+    };
+
+    // 필수 스탬프 카운트
+    const requiredPlaces = places.filter(p => p.isRequired);
+    const completedRequiredCount = requiredPlaces.filter(p => stamps[p.id]).length;
+
+    // 공통 헤더
+    const renderHeader = () => (
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#111', padding: '14px 22px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <button onClick={() => setView('landing')} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 16, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit' }}>
+          📍 구로 반나절
+        </button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {user ? (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
+                {user.user_metadata?.name || '모험가'} 님
+              </span>
+              <button onClick={handleLogout} style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 8, color: '#f87171', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>로그아웃</button>
+            </div>
+          ) : (
+            <button onClick={handleKakaoLogin} style={{ padding: '6px 12px', background: '#FEE500', border: 'none', borderRadius: 8, color: '#111', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 4 }}>
+              로그인
+            </button>
+          )}
+          <button onClick={() => setShowSettings(true)} style={{ background: 'none', border: 'none', color: '#888', fontSize: 16, cursor: 'pointer', padding: 4 }}>⚙️</button>
+        </div>
+      </div>
+    );
+
+    // 랜딩 뷰 렌더링
+    const renderLanding = () => (
+      <div>
+        {/* 히어로 */}
+        <div style={{ 
+          background: 'linear-gradient(rgba(0,0,0,0.52), rgba(0,0,0,0.72)), url("uploads/20260527_083055.jpg") no-repeat center center / cover', 
+          position: 'relative', 
+          overflow: 'hidden', 
+          padding: '60px 22px 56px' 
+        }}>
+          <div style={{ position: 'absolute', top: -80, right: -50, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(200,55,44,0.15) 0%, transparent 68%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -60, left: -30, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(217,119,6,0.12) 0%, transparent 68%)', pointerEvents: 'none' }} />
+
+          <div style={{ maxWidth: 480, margin: '0 auto', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(200,55,44,0.18)', borderRadius: 20, padding: '4px 14px', marginBottom: 14, width: 'fit-content' }}>
+              <span style={{ fontSize: 15.8 }}>🗺</span>
+              <span style={{ fontSize: 15.8, color: '#f87171', fontWeight: 600 }}>구로구 의외의 발견!!</span>
+            </div>
+
+            <h1 style={{ fontSize: 42, fontWeight: 900, color: '#fff', lineHeight: 1.1, marginBottom: 10, letterSpacing: '-0.025em' }}>
+              온가족 빅재미<br /><span style={{ color: '#f87171' }}>in 구로</span>
+            </h1>
+
+            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.52)', lineHeight: 1.7, marginBottom: 30 }}>
+              색안경을 벗고 보면<br />해외의 뉴타운과 올드타운을 거니는 느낌<br />가보자 구로~~
+            </p>
+
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { icon: '💰', label: '총 예산', val: '1인당 대략 5만원' },
+                { icon: '⏱', label: '소요시간', val: '대략 5시간' },
+                { icon: '📍', label: '장소', val: `${places.length}곳` },
+              ].map(s => (
+                <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '10px 16px', backdropFilter: 'blur(8px)' }}>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginBottom: 3 }}>{s.icon} {s.label}</div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{s.val}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 바디 */}
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 15px 140px' }}>
+          
+          {/* 환경 변수 미설정 시 안내 배너 */}
+          {!config.supabaseUrl && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: 16, padding: '14px 16px', marginTop: 20, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <span style={{ fontSize: 16 }}>⚠️</span>
+              <div>
+                <p style={{ fontSize: 13, color: '#991b1b', fontWeight: 700, marginBottom: 3 }}>설정이 되어 있지 않습니다</p>
+                <p style={{ fontSize: 12, color: '#b91c1c', lineHeight: 1.6 }}>
+                  스탬프 챌린지를 참여하시려면 우측 상단 ⚙️ 아이콘을 누르고 Supabase URL과 Anon Key를 먼저 설정해야 데이터가 안전하게 저장됩니다.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 스탬프 챌린지 프리뷰 */}
+          <div style={{ background: '#fff', borderRadius: 22, padding: '18px 20px', marginTop: 20, marginBottom: 26, border: '1px solid rgba(217,119,6,0.18)', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 20 }}>🎯</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>스탬프 챌린지</span>
+                <span style={{ fontSize: 12, color: '#888880' }}>3곳 완주 → 호떡 무료</span>
+              </div>
+              {user && (
+                <span style={{ fontSize: 12, background: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: 8, fontWeight: 700 }}>
+                  진행: {completedRequiredCount} / {requiredPlaces.length}
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {requiredPlaces.map((p, i) => (
+                <button
+                  key={p.id}
+                  className="stamp-preview-btn"
+                  onClick={() => {
+                    if (user) {
+                      setView('stamp');
+                    } else {
+                      setSelectedPlace(p);
+                    }
+                  }}
+                  style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}
+                >
+                  <div style={{ aspectRatio: '1', borderRadius: 14, background: stamps[p.id] ? '#D97706' : p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 6, border: '2px dashed rgba(217,119,6,0.28)', position: 'relative' }}>
+                    {stamps[p.id] ? (
+                      <span style={{ color: '#fff', fontSize: 24, fontWeight: 900 }}>✓</span>
+                    ) : (
+                      <span style={{ lineHeight: 1 }}>{p.emoji}</span>
+                    )}
+                    <div style={{ position: 'absolute', top: -5, right: -5, width: 18, height: 18, borderRadius: '50%', background: '#D97706', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>★</div>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#52525b', lineHeight: 1.4, textAlign: 'center', fontWeight: stamps[p.id] ? 700 : 400 }}>
+                    {(p.stampLabel || p.name).length > 6 ? (p.stampLabel || p.name).slice(0, 6) + '…' : (p.stampLabel || p.name)}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* 스탬프 챌린지 진입 버튼 */}
+            <button
+              onClick={handleStartChallenge}
+              style={{
+                width: '100%', marginTop: 14, padding: '13px 20px',
+                background: '#111', color: '#fff', border: 'none',
+                borderRadius: 14, cursor: 'pointer', fontSize: 14,
+                fontWeight: 700, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', gap: 8, fontFamily: 'inherit',
+              }}
+            >
+              <span style={{ fontSize: 16 }}>📸</span>
+              사진으로 스탬프 인증하기
+              {!user && <span style={{ fontSize: 11, background: 'rgba(255,255,255,0.15)', borderRadius: 6, padding: '2px 8px' }}>카카오 로그인</span>}
+            </button>
+          </div>
+
+          {/* 코스 섹션 */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111' }}>반나절 코스</h2>
+              <span style={{ fontSize: 13, color: '#888880' }}>장소를 눌러 상세 정보 확인</span>
+            </div>
+            <div>
+              {places.map((place, idx) => (
+                <PlaceCard key={place.id} place={place} idx={idx} onSelect={setSelectedPlace} />
+              ))}
+            </div>
+          </div>
+
+          {/* 지도 섹션 */}
+          <div style={{ marginTop: 38 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', marginBottom: 14 }}>코스 지도</h2>
+            <div style={{ borderRadius: 22, overflow: 'hidden', background: '#e0dfd9', position: 'relative', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+              <div ref={mapContainerRef} style={{ width: '100%', height: 320 }} />
+            </div>
+          </div>
+
+          {/* 비추천 안내 */}
+          <div style={{ marginTop: 28, background: '#fff', borderRadius: 22, padding: '18px 20px', border: '1px solid #ededE7', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 18 }}>✅</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>이런 분께 적극 추천</span>
+            </div>
+            {[
+              { e: '🌶', t: '향신료가 들어간 이국적인 음식을 좋아하는 사람' },
+              { e: '👨‍👩‍👧', t: '초등이상 아이와 함께 재미와 학습, 문화체험까지 하고 싶은 가족' },
+            ].map((item, i, arr) => (
+              <div key={item.t} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: i < arr.length - 1 ? 10 : 0 }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{item.e}</span>
+                <span style={{ fontSize: 13, color: '#52525b', lineHeight: 1.6 }}>{item.t}</span>
+              </div>
+            ))}
+          </div>
+
+
+        </div>
+
+      
+      </div>
+    );
+
+    // 스탬프 목록 뷰 렌더링
+    const renderStampList = () => (
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px 16px 120px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#111' }}>🎯 스탬프 챌린지</h2>
+          <button onClick={() => setView('landing')} style={{ background: '#e4e4de', border: 'none', borderRadius: 12, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            ← 코스 보기
+          </button>
+        </div>
+
+        {/* 진행상태 배지 */}
+        <div style={{ background: '#fff', borderRadius: 20, padding: '18px 20px', border: '1px solid rgba(217,119,6,0.16)', marginBottom: 20 }}>
+          <div style={{ fontSize: 13, color: '#71717a', marginBottom: 6, fontWeight: 500 }}>호떡 수령까지 진행 상황</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <span style={{ fontSize: 32, fontWeight: 900, color: '#D97706' }}>{completedRequiredCount}</span>
+            <span style={{ fontSize: 16, color: '#a1a1aa', fontWeight: 700 }}>/ {requiredPlaces.length} 완료</span>
+          </div>
+          {completedRequiredCount === requiredPlaces.length ? (
+            <button onClick={() => setView('complete')} style={{ width: '100%', marginTop: 14, padding: '10px', background: '#D97706', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              🎉 완주 완료! 사은품 쿠폰 받기
+            </button>
+          ) : (
+            <div style={{ height: 6, background: '#f4f4f0', borderRadius: 3, marginTop: 12, overflow: 'hidden' }}>
+              <div style={{ width: `${(completedRequiredCount / requiredPlaces.length) * 100}%`, height: '100%', background: '#D97706', transition: 'width 0.3s ease' }} />
+            </div>
+          )}
+        </div>
+
+        {/* 인증 대상 목록 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {requiredPlaces.map((p, idx) => {
+            const isDone = !!stamps[p.id];
+            return (
+              <div key={p.id} style={{ background: '#fff', borderRadius: 18, padding: 14, display: 'flex', gap: 14, alignItems: 'center', border: isDone ? '1px solid #10b981' : '1px solid #e4e4de' }}>
+                <div style={{ width: 44, height: 44, borderRadius: 10, background: p.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                  {p.emoji}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>{p.stampLabel || p.name}</div>
+                  <div style={{ fontSize: 11, color: '#888' }}>{p.address}</div>
+                </div>
+                {isDone ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                    <span style={{ fontSize: 11, color: '#10b981', fontWeight: 800 }}>✓ 인증 완료</span>
+                    <button 
+                      onClick={() => {
+                        setUploadPlace(p);
+                        setView('upload');
+                      }}
+                      style={{ background: 'none', border: 'none', color: '#6366f1', fontSize: 11, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit' }}
+                    >
+                      사진 변경
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setUploadPlace(p);
+                      setView('upload');
+                    }}
+                    style={{ padding: '8px 16px', background: '#D97706', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                  >
+                    사진 인증
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+
+    // 사진 업로드 뷰 렌더링
+    const renderUpload = () => {
+      const place = uploadPlace;
+      if (!place) return null;
+
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 16px 120px', display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', marginBottom: 28 }}>
+            <span style={{ fontSize: 56, marginBottom: 12, display: 'block' }}>📸</span>
+            <h3 style={{ fontSize: 22, fontWeight: 900, color: '#111', marginBottom: 6 }}>{place.name} 인증</h3>
+            <p style={{ fontSize: 13, color: '#71717a', lineHeight: 1.5 }}>
+              직접 방문해 촬영한 사진을 등록해 주세요.<br />
+              (클라이언트에서 용량이 2MB 이하로 자동 압축됩니다)
+            </p>
+          </div>
+
+          <div style={{ background: '#fff', borderRadius: 20, padding: 22, border: '1px solid #e4e4de', marginBottom: 24, textAlign: 'center' }}>
+            {stamps[place.id] && (
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ fontSize: 11, color: '#888', marginBottom: 6 }}>기존 인증 사진</p>
+                <img src={stamps[place.id]} alt="기존 사진" style={{ width: '100%', maxHeight: 180, objectFit: 'contain', borderRadius: 10 }} />
+              </div>
+            )}
+
+            <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px dashed #a1a1aa', borderRadius: 14, height: 160, cursor: 'pointer', transition: 'border-color 0.15s' }}>
+              <span style={{ fontSize: 28, marginBottom: 8 }}>📤</span>
+              <span style={{ fontSize: 13, color: '#111', fontWeight: 700 }}>사진 파일 선택</span>
+              <span style={{ fontSize: 11, color: '#71717a', marginTop: 4 }}>JPG, PNG, WEBP 지원</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                capture="environment" 
+                onChange={(e) => handlePhotoUpload(e, place.id)} 
+                disabled={uploading}
+                style={{ display: 'none' }} 
+              />
+            </label>
+          </div>
+
+          {uploading && (
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <div style={{ width: 28, height: 28, border: '3px solid #e4e4de', borderTopColor: '#D97706', borderRadius: '50%', display: 'inline-block', animation: 'stampPulse 1s infinite' }} />
+              <p style={{ fontSize: 12, color: '#D97706', fontWeight: 700, marginTop: 8 }}>사진 압축 및 업로드 중...</p>
+            </div>
+          )}
+
+          <button
+            onClick={() => {
+              setUploadPlace(null);
+              setView('stamp');
+            }}
+            disabled={uploading}
+            style={{ width: '100%', padding: '16px', background: '#f4f4f5', border: 'none', borderRadius: 14, cursor: 'pointer', fontSize: 14, fontWeight: 700, color: '#52525b', fontFamily: 'inherit' }}
+          >
+            뒤로가기
+          </button>
+        </div>
+      );
+    };
+
+    // 완주 완료 화면 렌더링 (S-005)
+    const renderComplete = () => {
+      const today = new Date().toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      return (
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '36px 20px 120px', textAlign: 'center' }}>
+          <span style={{ fontSize: 72, display: 'block', marginBottom: 14 }}>🎉</span>
+          <h2 style={{ fontSize: 26, fontWeight: 900, color: '#111', marginBottom: 8 }}>모험 완료!</h2>
+          <p style={{ fontSize: 14, color: '#52525b', lineHeight: 1.6, marginBottom: 30 }}>
+            구로의 이색 반나절 코스를 정복하셨습니다!<br />
+            아래 인증서를 캡처해 중국 베이커리 점원에게 보여주세요.
+          </p>
+
+          {/* 인증 쿠폰 */}
+          <div style={{ background: '#fff', border: '2.5px solid #D97706', borderRadius: 24, padding: '24px 20px', boxShadow: '0 10px 20px rgba(0,0,0,0.06)', position: 'relative', marginBottom: 32 }}>
+            <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: '#D97706', color: '#fff', fontSize: 11, fontWeight: 800, padding: '3px 12px', borderRadius: 12 }}>
+              OFFLINE COUPON
+            </div>
+            
+            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#111', marginTop: 10, marginBottom: 18 }}>구로 반나절 완주 인증서</h3>
+            
+            <div style={{ borderTop: '1px dashed #e4e4de', borderBottom: '1px dashed #e4e4de', padding: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <span style={{ color: '#888' }}>완주 모험가</span>
+                <span style={{ fontWeight: 700, color: '#111' }}>{user?.user_metadata?.name || '모험가'} 님</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <span style={{ color: '#888' }}>인증 일시</span>
+                <span style={{ fontWeight: 700, color: '#111' }}>{today}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <span style={{ color: '#888' }}>사은품</span>
+                <span style={{ fontWeight: 800, color: '#D97706' }}>중국 정통 호떡 1개</span>
+              </div>
+            </div>
+
+            <div style={{ fontSize: 11, color: '#a1a1aa', lineHeight: 1.5 }}>
+              ※ 캡처본을 쿠폰으로 사용 가능합니다.<br />
+              ※ 유효기간: 완주 당일 및 익일까지 유효.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <button
+              onClick={() => setView('landing')}
+              style={{ width: '100%', padding: '16px', background: '#111', color: '#fff', border: 'none', borderRadius: 14, cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: 'inherit' }}
+            >
+              처음 화면으로 이동
+            </button>
+            <button
+              onClick={() => setView('stamp')}
+              style={{ width: '100%', padding: '16px', background: '#f4f4f5', color: '#52525b', border: 'none', borderRadius: 14, cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: 'inherit' }}
+            >
+              스탬프 리스트 조회
+            </button>
+          </div>
+        </div>
+      );
+    };
+
+    return (
+      <div style={{ background: '#EDECE6', minHeight: '100vh' }}>
+        {renderHeader()}
+        
+        {view === 'landing' && renderLanding()}
+        {view === 'stamp' && renderStampList()}
+        {view === 'upload' && renderUpload()}
+        {view === 'complete' && renderComplete()}
+
+        {selectedPlace && <DetailModal place={selectedPlace} onClose={() => setSelectedPlace(null)} />}
+        
+        <SettingsModal 
+          isOpen={showSettings} 
+          onClose={() => setShowSettings(false)} 
+          config={config} 
+          onSave={handleSaveConfig} 
+        />
+      </div>
+    );
+  };
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
