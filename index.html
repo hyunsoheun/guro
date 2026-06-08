@@ -776,65 +776,32 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     };
 
-    const handleStartChallenge = () => { setView('stamp'); };= event.target.files[0];
+    const handleStartChallenge = () => { setView('stamp'); };
+
+    const handlePhotoUpload = async (event, placeId) => {
+      const file = event.target.files[0];
       if (!file) return;
-
-      if (!supabaseClient || !user) {
-        alert("로그인 세션이 만료되었거나 설정이 올바르지 않습니다.");
-        return;
-      }
-
       setUploading(true);
-
       try {
-        // 1. 클라이언트 사이드 이미지 압축
-        const options = {
-          maxSizeMB: 1.5,
-          maxWidthOrHeight: 1280,
-          useWebWorker: true,
+        const options = { maxSizeMB: 1.0, maxWidthOrHeight: 1280, useWebWorker: true };
+        const compressed = await imageCompression(file, options);
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const b64 = ev.target.result;
+          setStamps(prev => {
+            const next = { ...prev, [placeId]: b64 };
+            try { localStorage.setItem('guro_stamps', JSON.stringify(next)); } catch(e) {}
+            const reqIds = places.filter(p => p.isRequired).map(p => p.id);
+            if (reqIds.every(id => next[id])) setTimeout(() => setView('complete'), 400);
+            return next;
+          });
+          setUploadPlace(null);
+          setUploading(false);
+          setView('stamp');
         };
-        const compressedFile = await imageCompression(file, options);
-        
-        // 2. Storage 업로드
-        const fileExt = compressedFile.name.split('.').pop() || 'jpg';
-        const fileName = `${user.id}/${placeId}_${Date.now()}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabaseClient.storage
-          .from('stamp-photos')
-          .upload(fileName, compressedFile, {
-            contentType: compressedFile.type,
-            upsert: true
-          });
-
-        if (uploadError) throw uploadError;
-
-        // 3. 사진 Public URL 가져오기
-        const { data: { publicUrl } } = supabaseClient.storage
-          .from('stamp-photos')
-          .getPublicUrl(fileName);
-
-        // 4. DB Stamps 테이블에 저장
-        const { error: dbError } = await supabaseClient
-          .from('stamps')
-          .upsert({
-            user_id: user.id,
-            place_id: placeId,
-            photo_url: publicUrl
-          });
-
-        if (dbError) throw dbError;
-
-        // 5. 완료된 스탬프 목록 최신화
-        await fetchUserStamps(user.id);
-        setUploadPlace(null);
-        setView('stamp');
-        alert("스탬프가 정상적으로 적립되었습니다!");
-
-        // 6. 완주 여부 즉시 검증
-        checkIfAllComplete();
+        reader.readAsDataURL(compressed);
       } catch (err) {
-        console.error("업로드 에러:", err);
-        alert(`인증 업로드 실패: ${err.message || '다시 시도해 주세요.'}`);
-      } finally {
+        alert('사진 처리 실패: ' + (err.message || '다시 시도해 주세요.'));
         setUploading(false);
       }
     };
