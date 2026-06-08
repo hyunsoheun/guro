@@ -67,103 +67,93 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const DEFAULT_PLACES = [
     {
       id: 'lunch', order: 1,
-      name: 'G타워몰',
-      category: '점심 식사', duration: '1시간', budget: 15000, budgetLabel: '대략 인당 ₩15,000',
-      description: 'G타워몰 - 계절과 상관없이 즐기는 실내 맛집들',
+      name: '깔깔 거리 식당',
+      category: '점심 식사', duration: '1시간', budget: 15000, budgetLabel: '₩15,000',
+      description: '코스 시작 전 든든한 한 끼. 현지 직장인 맛집.',
       detail: '구로디지털단지역 인근 현지인들이 즐겨 찾는 식당가. 합리적인 가격에 푸짐한 한 끼를 해결할 수 있어요. 코스 출발 전 에너지 충전 필수!',
-      address: '서울시 구로구 디지털로 26길 38 G-Tower',
-      mapUrl: 'https://map.naver.com/v5/search/G타워몰 구로디지털단지',
+      address: '서울 구로구 디지털로 일대',
       transport: '구로디지털단지역 1번 출구 도보 5분',
-      tip: '🅿️ 주차 안내: 상업시설 G-Tower Mall 매장 이용 시 매장별로 2시간 무료 주차 가능',
-      website: 'https://g-tower.co.kr/',
+      tip: '점심 피크타임(12~13시)을 피하면 대기 없이 바로 입장 가능해요.',
       emoji: '🍜', bg: '#FFF3E0', accent: '#E65100', isRequired: false,
-      photo: 'uploads/캡처21.PNG',
-      photos: ['uploads/캡처21.PNG', 'uploads/캡처24.PNG', 'uploads/캡쳐22.PNG', 'uploads/20260527_082743.jpg', 'uploads/20260527_082921.jpg'],
+      photo: 'uploads/캡처11.PNG',
     },
     {
       id: 'netmarble', order: 2,
       name: '넷마블 게임 박물관',
-      category: '게임 체험', duration: '1시간 30분', budget: 10000, budgetLabel: '대략 성인 ₩10,000 / 초등 ₩7,000',
+      category: '게임 체험', duration: '1시간 30분', budget: 10000, budgetLabel: '입장료 성인 ₩10,000',
       description: '레트로 오락실부터 최신 게임까지. 코스 최고 하이라이트!',
       detail: '넷마블 본사 1층에 위치한 게임 테마 뮤지엄. 80~90년대 오락실 게임기를 직접 체험하고 레트로 게임의 추억을 되살릴 수 있어요. 게임을 잘 몰라도 충분히 재미있는 공간.',
       address: '서울 구로구 디지털로 242',
       transport: '구로 디지털 단지역에서 도보로 15분',
       tip: '2층 레트로 오락실 코너가 최고의 인증샷 포인트! 줄 설 수 있으니 오전 방문 추천.',
       hours: '10:00 ~ 18:00 (월요일 휴관)',
-      mapUrl: 'https://map.naver.com/v5/search/넷마블게임박물관',
       emoji: '🎮', bg: '#EDE7F6', accent: '#4527A0', isRequired: true,
-      photo: 'uploads/캡처25.PNG',
-      photos: ['uploads/캡처25.PNG', 'uploads/캡처26.PNG'],
+      photo: 'uploads/게임박물관2.jpg',
+      photos: ['uploads/게임박물관2.jpg', 'uploads/게임박물관.jpg', 'uploads/게임박물관3.jpg', 'uploads/안내.jpg', 'uploads/20260527_100943.jpg'],
     },
     {
       id: 'coffee', order: 3,
       name: '커피 브레이크',
-      category: '카페 휴식', duration: '30분', budget: 7000, budgetLabel: '대략 ₩7,000',
-      description: '박물관 관람 중간에 쉬어가는 달콤한 휴식.',
+      category: '카페 휴식', duration: '30분', budget: 7000, budgetLabel: '₩7,000',
+      description: '박물관 관람 후 잠깐 쉬어가는 달콤한 휴식.',
       detail: '넷마블 게임 박물관 관람 후 인근 카페에서 잠깐 쉬어가요. 구로디지털단지 일대에는 개성 있는 카페들이 많아요. 다음 이동을 위한 에너지 충전!',
-      address: 'G타워몰 내부',
-      mapUrl: 'https://map.naver.com/v5/search/G타워몰 구로디지털단지',
+      address: '구로디지털단지 카페거리',
       transport: '이전 장소에서 도보 5분',
       tip: '간단한 디저트와 함께하면 더욱 좋아요.',
       emoji: '☕', bg: '#FFF8E1', accent: '#D84315', isRequired: false,
-      photo: 'uploads/캡처29.PNG',
-      photos: ['uploads/캡처29.PNG', 'uploads/thumb-8f803855f4d7dcaa8218e57fce514cd0_wAvY6l1g_4baae7db4c1cfd94286f07872d767e566c75a452_330x330-a9846b8c.jpg', 'uploads/캡처27.PNG', 'uploads/캡처28.PNG'],
+      photo: 'uploads/커피브레이크.jpg',
     },
     {
       id: 'gvalley', order: 4,
       name: 'G밸리 산업 박물관',
-      category: '역사 체험', duration: '1시간', budget: 0, budgetLabel: '무료',
-      description: 'G밸리 산업 박물관 - 아이들은 역사 배움터, 어른들은 레트로 여행',
+      category: '역사 체험', duration: '30분', budget: 0, budgetLabel: '무료',
+      description: '구로공단의 역사를 VR로. 무료인데 너무 알차요!',
       detail: '1960~70년대 구로공단의 역사를 담은 박물관. 당시 공장 노동자들의 삶과 한국 산업화 역사를 VR 체험을 포함해 생생하게 느낄 수 있어요. 무료라는 게 믿기지 않을 정도로 알찬 구성.',
-      address: '서울 구로구 디지털로 26길 38 G-Tower',
-      mapUrl: 'https://map.naver.com/v5/search/G밸리산업박물관',
+      address: '서울 구로구 디지털로 26길',
       transport: '이전 장소에서 도보 8분',
       tip: 'VR 체험 대기가 생길 수 있으니 미리 대기 등록 추천.',
       hours: '09:00 ~ 18:00 (월요일 휴관)',
       emoji: '🏭', bg: '#E3F2FD', accent: '#1565C0', isRequired: false,
       photo: 'uploads/산업박물관 vr.jpg',
-      photos: ['uploads/산업박물관 vr.jpg', 'uploads/20260527_101235.jpg', 'uploads/20260527_101448.jpg', 'uploads/20260527_101611.jpg', 'uploads/20260527_102111.jpg', 'uploads/산업박물관2 vr.jpg', 'uploads/산업박물관3 vr.jpg', 'uploads/산업박물곤4.jpg'],
+      photos: ['uploads/산업박물관 vr.jpg', 'uploads/산업박물관2 vr.jpg', 'uploads/산업박물관3 vr.jpg', 'uploads/산업박물곤4.jpg'],
     },
     {
       id: 'market', order: 5,
       name: '남구로 시장',
-      category: '시장 탐방', duration: '1시간', budget: 10000, budgetLabel: '대략 ₩10,000',
-      description: '남구로 시장 - 안전하면서도 신기한 거 투성이, 장을 봐가도 좋아요',
+      category: '시장 탐방', duration: '1시간', budget: 10000, budgetLabel: '₩10,000',
+      description: '서울 속 작은 중국. 이국적인 골목 탐방!',
       detail: '색안경만 걷고 보면 서울 한복판의 작은 중국. 중국 식재료와 간판, 거리 분위기가 마치 중국 소도시에 온 듯한 이색 경험을 선사해요. 다양한 중국 간식을 저렴하게 맛볼 수 있고 골목 구석구석 탐방하는 재미가 있어요.',
-      address: '구로구 구로동 730번지 일대 (고대구로병원 옆)',
-      mapUrl: 'https://map.naver.com/v5/search/남구로시장',
+      address: '서울 구로구 남구로 일대',
       transport: '이전 장소에서 버스로 15분',
-      tip: '🅿️ 주차: 남구로 시장, 구로4동 공동 공영 주차장 / 5분당 100원 / 감면 혜택 있음 / 시장에서 1만원 이상 구매 시 무료 주차권',
+      tip: '오후 3~5시가 시장이 가장 활기찰 때. 현금 지참 추천.',
       emoji: '🏮', bg: '#FFEBEE', accent: '#C62828', isRequired: true,
-      photo: 'uploads/남구로시장1.jpg',
-      photos: ['uploads/남구로시장1.jpg', 'uploads/남구로시장 2.jpg', 'uploads/남구로시장3.jpg', 'uploads/남구로시장4.jpg', 'uploads/남구로시장-335e64a3.jpg', 'uploads/남구로시장6-dde64f7f.jpg', 'uploads/남구로시장 2-61cb711d.jpg'],
+      photo: 'uploads/남구로시장6.jpg',
+      photos: ['uploads/남구로시장6.jpg', 'uploads/남구로시장1.jpg', 'uploads/남구로시장 2.jpg', 'uploads/남구로시장3.jpg', 'uploads/남구로시장4.jpg', 'uploads/남구로시장5.jpg', 'uploads/남구로시장.jpg'],
     },
     {
       id: 'restaurant', order: 6,
       name: '린궁즈멘관',
-      category: '중국 정통 음식', duration: '40분', budget: 10000, budgetLabel: '대략 ₩10,000',
-      description: '중국 현지 식당에 와있는 듯한 이국적인 모든 것. 여권없이 가는 해외여행',
-      detail: '깔끔하고 맛있어요 😊 남구로 시장 인근에 위치한 정통 중국 음식점. 중국 현지 요리사가 만드는 본토 맛으로 유명해요. 양이 푸짐하고 가격도 착한 편. 중국 음식을 제대로 맛보고 싶다면 꼭 방문.',
-      tagline: '깔끔하고 맛있어요 👍',
-      address: '남구로 시장 입구',
-      mapUrl: 'https://map.naver.com/v5/search/린궁즈멘관',
+      category: '중국 정통 음식', duration: '40분', budget: 10000, budgetLabel: '₩10,000',
+      description: '중국 본토 맛 그대로. 현지인도 인정한 정통 중식.',
+      detail: '남구로 시장 인근에 위치한 정통 중국 음식점. 중국 현지 요리사가 만드는 본토 맛으로 유명해요. 양이 푸짐하고 가격도 착한 편. 중국 음식을 제대로 맛보고 싶다면 꼭 방문.',
+      address: '서울 구로구 남구로 인근',
       transport: '남구로 시장에서 도보 3분',
-      tip: '🅿️ 주차: 남구로 시장, 구로4동 공동 공영 주차장 / 5분당 100원 / 감면 혜택 있음 / 시장에서 1만원 이상 구매 시 무료 주차권',
+      tip: '마라탕과 훠궈가 시그니처 메뉴. 매운 음식에 약한 분은 주의!',
       hours: '11:00 ~ 21:00',
-      emoji: '🥟', bg: '#FCE4EC', accent: '#AD1457', isRequired: true,
+      emoji: '🥟', bg: '#FCE4EC', accent: '#AD1457', isRequired: false,
       photo: 'uploads/린궁즈멘관.jpg',
-      photos: ['uploads/린궁즈멘관.jpg', 'uploads/린궁즈멘관2.jpg', 'uploads/20260527_113544.jpg', 'uploads/20260527_112612.jpg', 'uploads/린궁즈멘관 메뉴판.jpg'],
+      photos: ['uploads/린궁즈멘관.jpg', 'uploads/린궁즈멘관 메뉴판.jpg'],
     },
     {
       id: 'bakery', order: 7,
       name: '중국 베이커리',
-      category: '스탬프 완주 사은품 수령 장소', duration: '20분', budget: 5000, budgetLabel: '대략 ₩5,000~',
+      category: '스탬프 수령 장소', duration: '20분', budget: 5000, budgetLabel: '₩5,000~',
       description: '마지막 스탬프 장소! 호떡으로 달콤하게 마무리.',
       detail: '구로 반나절 코스의 피날레. 핵심 3곳 스탬프를 완료한 후 이곳에서 완주 사은품(중국 호떡 1개)을 받을 수 있어요. 중국식 호떡과 각종 호빵이 인기 메뉴.',
-      address: '남구로 시장 입구',
-      mapUrl: 'https://map.naver.com/v5/search/남구로시장 구로구',
-      transport: '이전 장소에서 1분 도보',
-      emoji: '🧁', bg: '#FFF9C4', accent: '#E65100', isRequired: false, isFinal: true,
+      address: '서울 구로구 남구로 인근',
+      transport: '이전 장소에서 도보 2분',
+      tip: '스탬프 완주 화면을 캡처해서 점원에게 보여주면 호떡 1개 무료!',
+      emoji: '🧁', bg: '#FFF9C4', accent: '#E65100', isRequired: true, isFinal: true,
       photo: 'uploads/중국빵.jpg',
     },
   ];
@@ -338,7 +328,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                     <span style={{ fontSize: 11, background: '#D97706', color: '#fff', borderRadius: 6, padding: '3px 10px', fontWeight: 700 }}>★ 스탬프 필수</span>
                   )}
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111', lineHeight: 1.2 }}>{place.name}{place.tagline && <span style={{ fontSize: 13, fontWeight: 500, color: '#71717a', marginLeft: 8 }}>{place.tagline}</span>}</h2>
+                <h2 style={{ fontSize: 24, fontWeight: 900, color: '#111', lineHeight: 1.2 }}>{place.name}</h2>
               </div>
               <button
                 className="close-btn"
@@ -365,15 +355,9 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                 <span style={{ fontSize: 18, flexShrink: 0, lineHeight: 1 }}>📍</span>
-                <div style={{ flex: 1 }}>
+                <div>
                   <div style={{ fontSize: 11, color: '#888880', marginBottom: 2 }}>주소</div>
-                  <div style={{ fontSize: 14, color: '#111', lineHeight: 1.5, marginBottom: 6 }}>{place.address}</div>
-                  {place.mapUrl && (
-                    <a href={place.mapUrl} target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#03C75A', color: '#fff', borderRadius: 8, padding: '5px 12px', fontSize: 12, fontWeight: 700, textDecoration: 'none', fontFamily: 'inherit' }}>
-                      <span>🗺</span> 네이버 지도에서 보기
-                    </a>
-                  )}
+                  <div style={{ fontSize: 14, color: '#111', lineHeight: 1.5 }}>{place.address}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -393,31 +377,13 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
               </div>
             )}
 
-            {/* 웹사이트 바로가기 */}
-            {place.website && (
-              <a
-                href={place.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
-                  background: '#f7f7f3', border: '1.5px solid #e4e4de', borderRadius: 16,
-                  padding: '14px 20px', textDecoration: 'none',
-                }}
-              >
-                <span style={{ fontSize: 20 }}>🏢</span>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#111' }}>G타워몰 공식 홈페이지 바로가기</span>
-                <span style={{ fontSize: 13, color: '#888880' }}>→</span>
-              </a>
-            )}
-
             {/* 완주 배너 */}
             {place.isFinal && (
               <div style={{ marginTop: 20, background: '#D97706', borderRadius: 18, padding: '18px 20px', display: 'flex', gap: 14, alignItems: 'center' }}>
                 <span style={{ fontSize: 34, flexShrink: 0 }}>🎉</span>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 5 }}>스탬프 완주 사은품 수령 장소</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6 }}>핵심 3곳에서 얼굴이 찍힌 사진을 점원에게 보여주면 스탬프 완료 인정</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.88)', lineHeight: 1.6 }}>핵심 3곳 스탬프 완료 후 완주 화면을 보여주시면 호떡 1개를 드려요!</div>
                 </div>
               </div>
             )}
@@ -431,13 +397,13 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const SettingsModal = ({ isOpen, onClose, config, onSave }) => {
     const [url, setUrl] = useState(config.supabaseUrl || '');
     const [key, setKey] = useState(config.supabaseAnonKey || '');
-    const [naverKey, setNaverKey] = useState(config.naverClientId || '');
+    const [kakaoKey, setKakaoKey] = useState(config.kakaoMapKey || '');
 
     if (!isOpen) return null;
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      onSave({ supabaseUrl: url, supabaseAnonKey: key, naverClientId: naverKey });
+      onSave({ supabaseUrl: url, supabaseAnonKey: key, kakaoMapKey: kakaoKey });
       onClose();
     };
 
@@ -486,7 +452,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       return {
         supabaseUrl: localStorage.getItem('guro_supabase_url') || SUPABASE_URL || '',
         supabaseAnonKey: localStorage.getItem('guro_supabase_anon_key') || SUPABASE_ANON_KEY || '',
-        naverClientId: localStorage.getItem('guro_naver_client_id') || '',
+        kakaoMapKey: localStorage.getItem('guro_kakao_map_key') || '',
       };
     });
     const [showSettings, setShowSettings] = useState(false);
@@ -507,17 +473,10 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     useEffect(() => {
       if (config.supabaseUrl && config.supabaseAnonKey) {
         try {
-          // 설정이 기본값과 같으면 이미 생성된 클라이언트 재사용, 다르면 새로 생성
-          const isSameAsDefault =
-            config.supabaseUrl === SUPABASE_URL &&
-            config.supabaseAnonKey === SUPABASE_ANON_KEY;
-          const client = isSameAsDefault
-            ? supabase
-            : window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+          const client = supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
           setSupabaseClient(client);
         } catch (e) {
-          console.warn("Supabase client 생성 실패, 기본 클라이언트 사용:", e);
-          setSupabaseClient(supabase);
+          console.error("Supabase client 생성 실패:", e);
         }
       } else {
         setSupabaseClient(null);
@@ -613,10 +572,10 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
               const local = DEFAULT_PLACES.find(l => l.order === p.order_num) || {};
               return {
                 id: p.id,
-                name: local.name || p.name,
-                description: local.description || p.description,
-                address: local.address || p.address,
-                isRequired: local.isRequired !== undefined ? local.isRequired : p.is_required,
+                name: p.name,
+                description: p.description,
+                address: p.address,
+                isRequired: p.is_required,
                 order: p.order_num,
                 category: local.category || '명소',
                 duration: local.duration || '30분',
@@ -629,11 +588,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 photos: local.photos,
                 tip: local.tip,
                 isFinal: local.isFinal,
-                hours: local.hours,
-                transport: local.transport,
-                detail: local.detail,
-                tagline: local.tagline,
-                website: local.website
+                hours: local.hours
               };
             });
             setPlaces(enriched);
@@ -651,12 +606,13 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     useEffect(() => {
       if (view !== 'landing') return;
 
-      const naverKey = config.naverClientId;
+      const kakaoKey = config.kakaoMapKey;
+      if (!kakaoKey) return; // API 키가 설정 안 됐으면 이미지 맵 폴백을 보여줌
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting && !mapLoadedRef.current) {
-            loadLeafletMap();
+            loadKakaoMapScript(kakaoKey);
             mapLoadedRef.current = true;
           }
         });
@@ -669,70 +625,79 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       return () => {
         if (mapContainerRef.current) observer.unobserve(mapContainerRef.current);
       };
-    }, [view]);
+    }, [view, config.kakaoMapKey]);
 
-    const loadLeafletMap = () => {
-      if (window.L) { initLeafletMap(); return; }
-      // Leaflet CSS
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(link);
-      // Leaflet JS
+    const loadKakaoMapScript = (key) => {
+      if (window.kakao && window.kakao.maps) {
+        initMap();
+        return;
+      }
       const script = document.createElement('script');
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      script.onload = () => initLeafletMap();
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${key}&autoload=false`;
+      script.async = true;
       document.head.appendChild(script);
+      script.onload = () => {
+        window.kakao.maps.load(() => {
+          initMap();
+        });
+      };
     };
 
-    const initLeafletMap = () => {
-      if (!mapContainerRef.current || !window.L) return;
-      if (mapContainerRef.current._leaflet_id) return; // 이미 초기화됨
+    const initMap = () => {
+      if (!mapContainerRef.current) return;
+      
+      // 구로구 중심부 좌표
+      const options = {
+        center: new window.kakao.maps.LatLng(37.485, 126.892),
+        level: 5
+      };
+      const map = new window.kakao.maps.Map(mapContainerRef.current, options);
 
+      // 장소들 마커 표시
+      const bounds = new window.kakao.maps.LatLngBounds();
+      
+      // 장소별 대략적인 임시 위경도 매핑 (데모용)
       const COORDS = {
-        1: { lat: 37.4800, lng: 126.8955 }, // G타워몰
-        2: { lat: 37.4803, lng: 126.8959 }, // 넷마블
-        3: { lat: 37.4797, lng: 126.8951 }, // 커피브레이크
-        4: { lat: 37.4795, lng: 126.8956 }, // G밸리
-        5: { lat: 37.4893, lng: 126.8912 }, // 남구로시장
-        6: { lat: 37.4890, lng: 126.8908 }, // 린궁즈멘관
-        7: { lat: 37.4887, lng: 126.8910 }  // 중국베이커리
+        1: { lat: 37.4854, lng: 126.9015 }, // 깔깔거리
+        2: { lat: 37.4795, lng: 126.8964 }, // 넷마블
+        3: { lat: 37.4812, lng: 126.8978 }, // 커피
+        4: { lat: 37.4805, lng: 126.8931 }, // G밸리
+        5: { lat: 37.4862, lng: 126.8864 }, // 남구로시장
+        6: { lat: 37.4855, lng: 126.8858 }, // 린궁즈멘관
+        7: { lat: 37.4848, lng: 126.8860 }  // 중국베이커리
       };
 
-      const map = L.map(mapContainerRef.current, {
-        center: [37.4830, 126.8910],
-        zoom: 14,
-        zoomControl: true,
-        scrollWheelZoom: false
-      });
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 19
-      }).addTo(map);
-
-      const colors = ['#D97706','#4527A0','#D84315','#1565C0','#C62828','#AD1457','#E65100'];
-
-      places.forEach((p, idx) => {
+      places.forEach(p => {
         const coord = COORDS[p.order];
-        if (!coord) return;
-        const icon = L.divIcon({
-          html: `<div style="background:${colors[idx]};color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-family:sans-serif;">${p.order}</div>`,
-          className: '',
-          iconSize: [32, 32],
-          iconAnchor: [16, 16]
-        });
-        const marker = L.marker([coord.lat, coord.lng], { icon }).addTo(map);
-        marker.bindPopup(`<b style="font-size:13px">${p.name}</b>`);
-        marker.on('click', () => setSelectedPlace(p));
+        if (coord) {
+          const loc = new window.kakao.maps.LatLng(coord.lat, coord.lng);
+          const marker = new window.kakao.maps.Marker({
+            position: loc,
+            map: map,
+            title: p.name
+          });
+          
+          const infowindow = new window.kakao.maps.InfoWindow({
+            content: `<div style="padding:5px;font-size:12px;font-weight:700;">${p.name}</div>`
+          });
+          
+          window.kakao.maps.event.addListener(marker, 'click', () => {
+            setSelectedPlace(p);
+          });
+          
+          bounds.extend(loc);
+        }
       });
+      
+      // 지도가 모든 마커를 포함할 수 있게 맞춤
+      map.setBounds(bounds);
     };
 
     // 설정 값 로컬스토리지 저장 및 재로드
     const handleSaveConfig = (newConfig) => {
       localStorage.setItem('guro_supabase_url', newConfig.supabaseUrl);
       localStorage.setItem('guro_supabase_anon_key', newConfig.supabaseAnonKey);
-      localStorage.setItem('guro_naver_client_id', newConfig.naverClientId);
+      localStorage.setItem('guro_kakao_map_key', newConfig.kakaoMapKey);
       setConfig(newConfig);
       window.location.reload();
     };
@@ -898,7 +863,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       <div>
         {/* 히어로 */}
         <div style={{ 
-          background: 'linear-gradient(rgba(0,0,0,0.52), rgba(0,0,0,0.72)), url("uploads/20260527_083055.jpg") no-repeat center center / cover', 
+          background: 'linear-gradient(rgba(17, 17, 17, 0.72), rgba(17, 17, 17, 0.9)), url("uploads/guro_playground.png") no-repeat center center / cover', 
           position: 'relative', 
           overflow: 'hidden', 
           padding: '60px 22px 56px' 
@@ -907,9 +872,9 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
           <div style={{ position: 'absolute', bottom: -60, left: -30, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(217,119,6,0.12) 0%, transparent 68%)', pointerEvents: 'none' }} />
 
           <div style={{ maxWidth: 480, margin: '0 auto', position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(200,55,44,0.18)', borderRadius: 20, padding: '4px 14px', marginBottom: 14, width: 'fit-content' }}>
-              <span style={{ fontSize: 15.8 }}>🗺</span>
-              <span style={{ fontSize: 15.8, color: '#f87171', fontWeight: 600 }}>구로구 의외의 발견!!</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(200,55,44,0.18)', borderRadius: 20, padding: '4px 14px', marginBottom: 14 }}>
+              <span style={{ fontSize: 12 }}>🗺</span>
+              <span style={{ fontSize: 12, color: '#f87171', fontWeight: 600 }}>서울 구로구 어드벤처 가이드</span>
             </div>
 
             <h1 style={{ fontSize: 42, fontWeight: 900, color: '#fff', lineHeight: 1.1, marginBottom: 10, letterSpacing: '-0.025em' }}>
@@ -917,13 +882,13 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             </h1>
 
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.52)', lineHeight: 1.7, marginBottom: 30 }}>
-              색안경을 벗고 보면 해외의 뉴타운과 올드타운을 거니는 느낌..<br />가보자 구로~~
+              게임, 박물관, 시장, 중국 본토 음식까지<br />구로에서 펼쳐지는 반나절 빅재미!
             </p>
 
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {[
-                { icon: '💰', label: '총 예산', val: '1인당 대략 5만원' },
-                { icon: '⏱', label: '소요시간', val: '대략 5시간' },
+                { icon: '💰', label: '총 예산', val: '5만원' },
+                { icon: '⏱', label: '소요', val: '약 4시간' },
                 { icon: '📍', label: '장소', val: `${places.length}곳` },
               ].map(s => (
                 <div key={s.label} style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '10px 16px', backdropFilter: 'blur(8px)' }}>
@@ -1012,19 +977,44 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
           <div style={{ marginTop: 38 }}>
             <h2 style={{ fontSize: 20, fontWeight: 900, color: '#111', marginBottom: 14 }}>코스 지도</h2>
             <div style={{ borderRadius: 22, overflow: 'hidden', background: '#e0dfd9', position: 'relative', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-              <div ref={mapContainerRef} style={{ width: '100%', height: 320 }} />
+              {config.kakaoMapKey ? (
+                // 카카오맵 렌더링 컨테이너
+                <div ref={mapContainerRef} style={{ width: '100%', height: 320 }} />
+              ) : (
+                // 카카오맵 API 키 미설정 시 로컬 캡처 이미지로 폴백 제공
+                <>
+                  <img src="uploads/캡처10.PNG" alt="구로 반나절 코스 지도" style={{ width: '100%', display: 'block' }} />
+                  <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                    <div style={{ position: 'absolute', top: '33%', right: '5%' }}>
+                      <div style={{ background: '#D97706', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>① 깔깔거리</div>
+                    </div>
+                    <div style={{ position: 'absolute', top: '68%', left: '37%' }}>
+                      <div style={{ background: '#4527A0', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>② 넷마블게임박물관</div>
+                    </div>
+                    <div style={{ position: 'absolute', top: '60%', left: '55%' }}>
+                      <div style={{ background: '#1565C0', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 10, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>③ G밸리산업박물관</div>
+                    </div>
+                    <div style={{ position: 'absolute', top: '7%', left: '12%' }}>
+                      <div style={{ background: '#C62828', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>④ 남구로 시장</div>
+                    </div>
+                    <div style={{ position: 'absolute', top: '20%', left: '14%' }}>
+                      <div style={{ background: '#AD1457', color: '#fff', borderRadius: 20, padding: '3px 9px', fontSize: 11, fontWeight: 800, whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(0,0,0,0.25)' }}>⑤ 린궁즈멘관</div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
           {/* 비추천 안내 */}
           <div style={{ marginTop: 28, background: '#fff', borderRadius: 22, padding: '18px 20px', border: '1px solid #ededE7', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 18 }}>✅</span>
-              <span style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>이런 분께 적극 추천</span>
+              <span style={{ fontSize: 18 }}>⚠️</span>
+              <span style={{ fontSize: 15, fontWeight: 700, color: '#111' }}>이런 분께는 비추천이에요</span>
             </div>
             {[
-              { e: '🌶', t: '향신료가 들어간 이국적인 음식을 좋아하는 사람' },
-              { e: '👨‍👩‍👧', t: '초등이상 아이와 함께 재미와 학습, 문화체험까지 하고 싶은 가족' },
+              { e: '🌶', t: '향신료에 예민하신 분 — 중국 음식 코스가 포함되어 있어요' },
+              { e: '👶', t: '어린아이 동반 가족 — 도보 이동 구간이 있고 시장이 복잡해요' },
             ].map((item, i, arr) => (
               <div key={item.t} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: i < arr.length - 1 ? 10 : 0 }}>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{item.e}</span>
@@ -1032,11 +1022,24 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
               </div>
             ))}
           </div>
-
-
         </div>
 
-      
+        {/* 플로팅 CTA */}
+        <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, padding: '18px 16px 28px', background: 'linear-gradient(to top, #EDECE6 55%, transparent)' }}>
+          <div style={{ maxWidth: 480, margin: '0 auto' }}>
+            <button
+              className="cta-btn"
+              onClick={handleStartChallenge}
+              style={{ width: '100%', padding: '17px 24px', background: '#111', color: '#fff', border: 'none', borderRadius: 18, cursor: 'pointer', fontSize: 16, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, boxShadow: '0 4px 28px rgba(0,0,0,0.22)', fontFamily: 'inherit' }}
+            >
+              <span style={{ fontSize: 18 }}>🎯</span>
+              {user ? "내 스탬프 현황 보기" : "스탬프 도전하기"}
+              {!user && (
+                <span style={{ fontSize: 11, background: 'rgba(255,255,255,0.14)', borderRadius: 8, padding: '2px 9px', fontWeight: 500 }}>카카오 1초 로그인</span>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     );
 
