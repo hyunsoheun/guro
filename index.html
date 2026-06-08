@@ -498,7 +498,12 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     // 비즈니스 데이터 상태
     const [places, setPlaces] = useState(DEFAULT_PLACES);
     const [user, setUser] = useState(null);
-    const [stamps, setStamps] = useState({}); // { [placeId]: photoUrl }
+    const [stamps, setStamps] = useState(() => {
+    try {
+      const saved = localStorage.getItem('guro_stamps');
+      return saved ? JSON.parse(saved) : {};
+    } catch(e) { return {}; }
+  }); // { [placeId]: photoUrl (base64 or objectURL) }
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     
@@ -1220,7 +1225,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             <div style={{ borderTop: '1px dashed #e4e4de', borderBottom: '1px dashed #e4e4de', padding: '16px 0', display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 18 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                 <span style={{ color: '#888' }}>완주 모험가</span>
-                <span style={{ fontWeight: 700, color: '#111' }}>{user?.user_metadata?.name || '모험가'} 님</span>
+                <span style={{ fontWeight: 700, color: '#111' }}>모험가 님</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                 <span style={{ color: '#888' }}>인증 일시</span>
